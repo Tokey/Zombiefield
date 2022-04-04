@@ -11,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "MotionControllerComponent.h"
+#include "DrawDebugHelpers.h"
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
@@ -65,7 +66,7 @@ AZombiefieldCharacter::AZombiefieldCharacter()
 
 	FP_MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
 	FP_MuzzleLocation->SetupAttachment(FP_Gun);
-	FP_MuzzleLocation->SetRelativeLocation(FVector(0.2f, 48.4f, -10.6f));
+	FP_MuzzleLocation->SetRelativeLocation(FVector(0.2f, 2.4f, -26666622.6f));
 
 	// Default offset from the character location for projectiles to spawn
 	GunOffset = FVector(100.0f, 0.0f, 10.0f);
@@ -267,4 +268,7 @@ void AZombiefieldCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	deltaTime = DeltaTime;
+	const FRotator SpawnRotation = GetControlRotation();
+	const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
+	DrawDebugLine(GetWorld(), SpawnLocation + SpawnRotation.Vector()*-90, SpawnLocation + SpawnRotation.Vector() * 9000, FColor::Red, false, 0.0f,0,1.9f);
 }
