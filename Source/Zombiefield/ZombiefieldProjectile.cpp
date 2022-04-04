@@ -3,12 +3,15 @@
 #include "ZombiefieldProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
-AZombiefieldProjectile::AZombiefieldProjectile() 
+
+AZombiefieldProjectile::AZombiefieldProjectile()
 {
 	// Use a sphere as a simple collision representation
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-	CollisionComp->InitSphereRadius(5.0f);
+	CollisionComp->InitSphereRadius(1.0f);
 	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
 	CollisionComp->OnComponentHit.AddDynamic(this, &AZombiefieldProjectile::OnHit);		// set up a notification for when this component hits something blocking
 
@@ -22,13 +25,14 @@ AZombiefieldProjectile::AZombiefieldProjectile()
 	// Use a ProjectileMovementComponent to govern this projectile's movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
 	ProjectileMovement->UpdatedComponent = CollisionComp;
-	ProjectileMovement->InitialSpeed = 6000.f;
-	ProjectileMovement->MaxSpeed = 6000.f;
+	ProjectileMovement->InitialSpeed = 10000.f;
+	ProjectileMovement->MaxSpeed = 10000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
-	ProjectileMovement->bShouldBounce = true;
 
 	// Die after 3 seconds by default
-	InitialLifeSpan = 1.0f;
+	InitialLifeSpan = 2.0f;
+
+	this->SetActorScale3D(FVector(.1, .1, .1));
 }
 
 
@@ -38,8 +42,10 @@ void AZombiefieldProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAc
 	// Only add impulse and destroy projectile if we hit a physics
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics())
 	{
-		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
+		OtherComp->AddImpulseAtLocation(GetVelocity() * 10.0f, GetActorLocation());
 
 		Destroy();
 	}
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), spawnEffect, this->GetActorLocation(), Hit.ImpactNormal.Rotation());
+	Destroy();
 }

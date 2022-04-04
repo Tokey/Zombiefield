@@ -4,7 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "ZombiefieldProjectile.generated.h"
+
 
 class USphereComponent;
 class UProjectileMovementComponent;
@@ -17,6 +20,9 @@ class AZombiefieldProjectile : public AActor
 	/** Sphere collision component */
 	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
 	USphereComponent* CollisionComp;
+
+	UPROPERTY(EditAnywhere, Category = ProjectileEffects)
+		UNiagaraSystem* spawnEffect;
 
 	/** Projectile movement component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
