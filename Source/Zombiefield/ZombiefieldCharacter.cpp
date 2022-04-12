@@ -213,5 +213,5 @@ void AZombiefieldCharacter::Tick(float DeltaTime)
 	const FRotator SpawnRotation = GetControlRotation();
 	const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
 
-	DrawDebugLine(GetWorld(), SpawnLocation + SpawnRotation.Vector() * -90, SpawnLocation + SpawnRotation.Vector() * 9000, FColor::Red, false, 0.1f, 0, 1.9f);
+	//DrawDebugLine(GetWorld(), SpawnLocation + SpawnRotation.Vector() * -90, SpawnLocation + SpawnRotation.Vector() * 9000, FColor::Red, false, 0.1f, 0, 1.9f);
 }
