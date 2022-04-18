@@ -3,17 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "GameFramework/Character.h"
 #include "Zombie.generated.h"
 
 UCLASS()
-class ZOMBIEFIELD_API AZombie : public AActor
+class ZOMBIEFIELD_API AZombie : public ACharacter
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
+
+public:
+	// Sets default values for this character's properties
 	AZombie();
+
+	void GetActorEyesViewPoint(FVector& Location, FRotator& Rotation) const override;
 
 protected:
 	// Called when the game starts or when spawned
@@ -23,7 +25,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditEverywhere)
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName EyeSocketName;
 };
