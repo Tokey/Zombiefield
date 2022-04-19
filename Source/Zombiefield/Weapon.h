@@ -55,4 +55,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configurations")
 		FTransform placementTransform;
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="IK")
+	FTransform GetSightsWorldTransform() const;
+	virtual FTransform GetSightsWorldTransform_Implementation() const {return mesh->GetSocketTransform(FName("Sights"));}
 };

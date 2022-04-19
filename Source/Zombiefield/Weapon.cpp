@@ -24,13 +24,7 @@ AWeapon::AWeapon()
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
-	mesh->SetVisibility(false);
+	if(!currentOwner)
+		mesh->SetVisibility(false);
 }
-
-//// Called every frame
-//void AWeapon::Tick(float DeltaTime)
-//{
-//	Super::Tick(DeltaTime);
-//
-//}
 

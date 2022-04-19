@@ -23,18 +23,18 @@ void AMainCharacter::BeginPlay()
 	Super::BeginPlay();
 	if (HasAuthority())
 	{
-		for (const TSubclassOf<AWeapon>& WeaponClass : defaultWeapons)
+		for (const TSubclassOf<AWeapon>& WeaponClass : DefaultWeapons)
 		{
 			if (!WeaponClass) continue;
 			FActorSpawnParameters params;
 			params.Owner = this;
 
 			AWeapon* spawnedWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponClass, params);
-			const int32 index = weapons.Add(spawnedWeapon);
+			const int32 index = Weapons.Add(spawnedWeapon);
 
-			if (index == currentIndex)
+			if (index == CurrentIndex)
 			{
-				currentWeapon = spawnedWeapon;
+				CurrentWeapon = spawnedWeapon;
 				OnRep_CurrentWeapon(nullptr);
 			}
 		}
@@ -45,8 +45,8 @@ void AMainCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(AMainCharacter, weapons, COND_None);
-	DOREPLIFETIME_CONDITION(AMainCharacter, currentWeapon, COND_None);
+	DOREPLIFETIME_CONDITION(AMainCharacter, Weapons, COND_None);
+	DOREPLIFETIME_CONDITION(AMainCharacter, CurrentWeapon, COND_None);
 }
 
 
@@ -62,6 +62,9 @@ void AMainCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	PlayerInputComponent->BindAction("NextWeapon", EInputEvent::IE_Pressed, this, &AMainCharacter::NextWeapon);
+	PlayerInputComponent->BindAction("PreviousWeapon", EInputEvent::IE_Pressed, this, &AMainCharacter::PreviousWeapon);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AMainCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AMainCharacter::MoveRight);
@@ -88,22 +91,70 @@ void AMainCharacter::MoveRight(float Value)
 	}
 }
 
-void AMainCharacter::OnRep_CurrentWeapon(const AWeapon* oldWeapon)
-{
-	if (currentWeapon) {
-		if (!currentWeapon->currentOwner)
-		{
-			const FTransform placementTransform = currentWeapon->placementTransform * GetMesh()->GetSocketTransform(FName("Weapon_R"));
-			currentWeapon->SetActorTransform(placementTransform, false, nullptr, ETeleportType::TeleportPhysics);
-			currentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, FName("Weapon_R"));
 
-			currentWeapon->mesh->SetVisibility(true);
-			currentWeapon->currentOwner = this;
-		}
+
+void AMainCharacter::NextWeapon()
+{
+	const int32 Index = Weapons.IsValidIndex(CurrentIndex + 1) ? CurrentIndex + 1 : 0;
+	EquipWeapon(Index);
+
+}
+
+void AMainCharacter::PreviousWeapon()
+{
+	const int32 Index = Weapons.IsValidIndex(CurrentIndex - 1) ? CurrentIndex - 1 : Weapons.Num() - 1;
+	EquipWeapon(Index);
+}
+
+void AMainCharacter::EquipWeapon(const int32 Index)
+{
+	if (!Weapons.IsValidIndex(Index) || CurrentWeapon == Weapons[Index]) return;
+
+	if (IsLocallyControlled()) {
+		CurrentIndex = Index;
+
+		const AWeapon* OldWeapon = CurrentWeapon;
+		CurrentWeapon = Weapons[Index];
+		OnRep_CurrentWeapon(OldWeapon);
+
 	}
-	if (oldWeapon)
+
+	else if (!HasAuthority())
 	{
-		oldWeapon->mesh->SetVisibility(false);
+		Server_SetCurrentWeapon_Implementation(Weapons[Index]);
 	}
 }
+void AMainCharacter::Server_SetCurrentWeapon_Implementation(class AWeapon* NewWeapon)
+{
+	const AWeapon* OldWeapon = CurrentWeapon;
+	CurrentWeapon = NewWeapon;
+	OnRep_CurrentWeapon(OldWeapon);
+}
+
+
+void AMainCharacter::OnRep_CurrentWeapon(const AWeapon* OldWeapon)
+{
+	if (CurrentWeapon) {
+		if (!CurrentWeapon->currentOwner)
+		{
+			const FTransform placementTransform = CurrentWeapon->placementTransform * GetMesh()->GetSocketTransform(FName("Weapon_R"));
+			CurrentWeapon->SetActorTransform(placementTransform, false, nullptr, ETeleportType::TeleportPhysics);
+			CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, FName("Weapon_R"));
+
+			
+			CurrentWeapon->currentOwner = this;
+		}
+		CurrentWeapon->mesh->SetVisibility(true);
+	}
+	if (OldWeapon)
+	{
+		OldWeapon->mesh->SetVisibility(false);
+	}
+
+	CurrentWeaponChangedDelegate.Broadcast(CurrentWeapon,OldWeapon);
+}
+
+
+
+
 

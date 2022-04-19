@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "MainCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FCurrentWeaponChangedDelegate, class AWeapon*, CurrentWeapon, const class AWeapon*, OldWeapon);
+
 UCLASS()
 class ZOMBIEFIELD_API AMainCharacter : public ACharacter
 {
@@ -33,23 +35,36 @@ public:
 	void MoveForward(float Val);
 	void MoveRight(float Val);
 
+	virtual void NextWeapon();
+	virtual void PreviousWeapon();
 
 protected:
 	//Weapon spawned by default
 	UPROPERTY(EditDefaultsOnly, Category="Configurations")
-	TArray<TSubclassOf<class AWeapon>> defaultWeapons;
+	TArray<TSubclassOf<class AWeapon>> DefaultWeapons;
 
 public:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Replicated, Category="State")
-	TArray <class AWeapon*> weapons;
+	TArray <class AWeapon*> Weapons;
 
 	UPROPERTY(VisibleInstanceOnly,BlueprintReadWrite,ReplicatedUsing = OnRep_CurrentWeapon, Category= "State")
-	class AWeapon* currentWeapon;
+	class AWeapon* CurrentWeapon;
+
+	//Called after changing weapons
+	UPROPERTY(BlueprintAssignable, Category="Delegates")
+	FCurrentWeaponChangedDelegate CurrentWeaponChangedDelegate;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Replicated, Category = "State")
-	int32 currentIndex =0;
+	int32 CurrentIndex =0;
+
+	UFUNCTION(BlueprintCallable, Category="Character")
+	virtual void EquipWeapon(const int32 Index);
 
 protected:
 	UFUNCTION()
 	virtual void OnRep_CurrentWeapon(const class AWeapon* oldWeapon);
+
+	UFUNCTION(Server, Reliable)
+	void Server_SetCurrentWeapon(class AWeapon* Weapon);
+	virtual void Server_SetCurrentWeapon_Implementation(class AWeapon* Weapon);
 };
