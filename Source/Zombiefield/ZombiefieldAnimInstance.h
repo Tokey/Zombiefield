@@ -14,13 +14,13 @@ class ZOMBIEFIELD_API UZombiefieldAnimInstance : public UAnimInstance
 
 public:
 	UZombiefieldAnimInstance();
-	UFUNCTION()
-	virtual  void CurrentWeaponChanged(class AWeapon* NewWeapon, const class AWeapon* OldWeapon);
+	
 
 protected:
 	virtual void NativeBeginPlay() override;
 	virtual void NativeUpdateAnimation(float DeltaTime) override;
-
+	UFUNCTION()
+	virtual  void CurrentWeaponChanged(class AWeapon* NewWeapon, const class AWeapon* OldWeapon);
 	
 	virtual  void SetVariables(const float DeltaTime);
 	virtual  void CalculateWeaponSway(const float DeltaTime);

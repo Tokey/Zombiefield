@@ -14,8 +14,8 @@ UZombiefieldAnimInstance::UZombiefieldAnimInstance()
 void UZombiefieldAnimInstance::NativeBeginPlay()
 {
 	Super::NativeBeginPlay();
-	/*Character = Cast<AMainCharacter>(TryGetPawnOwner());
-	if (Character)
+	Character = Cast<AMainCharacter>(TryGetPawnOwner());
+	/*if (Character)
 	{
 		Mesh = Character->GetMesh();
 		Character->CurrentWeaponChangedDelegate.AddDynamic(this, &UZombiefieldAnimInstance::CurrentWeaponChanged);
@@ -32,6 +32,7 @@ void UZombiefieldAnimInstance::NativeUpdateAnimation(float DeltaTime)
 		Character = Cast<AMainCharacter>(TryGetPawnOwner());
 		if(Character)
 		{
+
 			Mesh = Character->GetMesh();
 			Character->CurrentWeaponChangedDelegate.AddDynamic(this, &UZombiefieldAnimInstance::CurrentWeaponChanged);
 			CurrentWeaponChanged(Character->CurrentWeapon, nullptr);
@@ -71,5 +72,5 @@ void UZombiefieldAnimInstance::CalculateWeaponSway(const float DeltaTime)
 
 void UZombiefieldAnimInstance::SetIKTransforms()
 {
-	RHandToSightTransform = CurrentWeapon->GetSightsWorldTransform().GetRelativeTransform(Mesh->GetSocketTransform(FName("Weapon_R")));
+	RHandToSightTransform = CurrentWeapon->GetSightsWorldTransform().GetRelativeTransform(Mesh->GetSocketTransform(FName("hand_r")));
 }
