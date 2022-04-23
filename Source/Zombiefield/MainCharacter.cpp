@@ -10,8 +10,10 @@
 AMainCharacter::AMainCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	//PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
+	GetMesh()->SetTickGroup(ETickingGroup::TG_PostUpdateWork);
+	
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->bUsePawnControlRotation = true;
 	Camera->SetupAttachment(GetMesh(), FName("Head"));

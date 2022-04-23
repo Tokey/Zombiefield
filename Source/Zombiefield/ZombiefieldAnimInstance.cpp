@@ -14,20 +14,30 @@ UZombiefieldAnimInstance::UZombiefieldAnimInstance()
 void UZombiefieldAnimInstance::NativeBeginPlay()
 {
 	Super::NativeBeginPlay();
-	Character = Cast<AMainCharacter>(TryGetPawnOwner());
+	/*Character = Cast<AMainCharacter>(TryGetPawnOwner());
 	if (Character)
 	{
 		Mesh = Character->GetMesh();
 		Character->CurrentWeaponChangedDelegate.AddDynamic(this, &UZombiefieldAnimInstance::CurrentWeaponChanged);
 		CurrentWeaponChanged(Character->CurrentWeapon, nullptr);
-	}
+	}*/
 }
 
 void UZombiefieldAnimInstance::NativeUpdateAnimation(float DeltaTime)
 {
 	Super::NativeUpdateAnimation(DeltaTime);
 
-	if(!Character) return;
+	if(!Character)
+	{
+		Character = Cast<AMainCharacter>(TryGetPawnOwner());
+		if(Character)
+		{
+			Mesh = Character->GetMesh();
+			Character->CurrentWeaponChangedDelegate.AddDynamic(this, &UZombiefieldAnimInstance::CurrentWeaponChanged);
+			CurrentWeaponChanged(Character->CurrentWeapon, nullptr);
+		}
+		else return;
+	}
 
 	SetVariables(DeltaTime);
 	CalculateWeaponSway(DeltaTime);
