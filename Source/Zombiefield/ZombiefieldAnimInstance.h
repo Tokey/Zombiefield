@@ -50,4 +50,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anim")
 	FTransform RHandToSightTransform;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anim")
+	FTransform OffsetTransform;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anim")
+	float ADSWeight = 0.f;
 };

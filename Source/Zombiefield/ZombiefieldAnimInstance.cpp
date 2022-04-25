@@ -62,6 +62,8 @@ void UZombiefieldAnimInstance::SetVariables(const float DeltaTime)
 	const FTransform& RootOffset = Mesh->GetSocketTransform(FName("root"),RTS_Component).Inverse() * Mesh->GetSocketTransform(FName("ik_hand_root"));
 	RelativeCameraTransform = CameraTransform.GetRelativeTransform(RootOffset);
 
+	ADSWeight = Character->ADSWeight;
+	
 	//RHandToSightTransform = 
 }
 

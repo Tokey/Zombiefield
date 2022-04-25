@@ -10,9 +10,18 @@
 AMainCharacter::AMainCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	GetMesh()->SetTickGroup(ETickingGroup::TG_PostUpdateWork);
+	GetMesh()->bVisibleInReflectionCaptures = true;
+	GetMesh()->bCastHiddenShadow = true;
+
+	ClientMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ClientMesh"));
+	ClientMesh->SetCastShadow(false);
+	ClientMesh->SetCastHiddenShadow(false);
+	ClientMesh->bVisibleInReflectionCaptures = false;
+	ClientMesh->SetTickGroup(ETickingGroup::TG_PostUpdateWork);
+	ClientMesh->SetupAttachment(GetMesh());
 	
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->bUsePawnControlRotation = true;
@@ -23,6 +32,30 @@ AMainCharacter::AMainCharacter()
 void AMainCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	// Setup ADS timeline
+	if(AimingCurve)
+	{
+		FOnTimelineFloat TimelineFloat;
+		TimelineFloat.BindDynamic(this, &AMainCharacter::TimeLineProgress);
+
+		AimingTimeline.AddInterpFloat(AimingCurve, TimelineFloat);
+	}
+	
+	
+	
+	// Client Mesh logic
+	if(IsLocallyControlled())
+	{
+		ClientMesh->HideBoneByName(FName("neck_01"), EPhysBodyOp::PBO_None);
+		GetMesh()->SetVisibility(false);
+	}
+	else
+	{
+		ClientMesh->DestroyComponent();
+	}
+
+	// Spawning weapon
 	if (HasAuthority())
 	{
 		for (const TSubclassOf<AWeapon>& WeaponClass : DefaultWeapons)
@@ -54,17 +87,21 @@ void AMainCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 
 // Called every frame
-//void AMainCharacter::Tick(float DeltaTime)
-//{
-//	Super::Tick(DeltaTime);
-//
-//}
+void AMainCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	AimingTimeline.TickTimeline(DeltaTime);
+}
 
 // Called to bind functionality to input
 void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	PlayerInputComponent->BindAction("Aim", EInputEvent::IE_Pressed, this, &AMainCharacter::StartAiming);
+	PlayerInputComponent->BindAction("Aim", EInputEvent::IE_Released, this, &AMainCharacter::ReverseAiming);
+	
 	PlayerInputComponent->BindAction("NextWeapon", EInputEvent::IE_Pressed, this, &AMainCharacter::NextWeapon);
 	PlayerInputComponent->BindAction("PreviousWeapon", EInputEvent::IE_Pressed, this, &AMainCharacter::PreviousWeapon);
 
@@ -93,6 +130,46 @@ void AMainCharacter::MoveRight(float Value)
 	}
 }
 
+void AMainCharacter::StartAiming()
+{
+	if (IsLocallyControlled() || HasAuthority()) {
+		Multi_Aim_Implementation(true);
+	}
+	if(!HasAuthority())
+	{
+		Server_Aim(true);
+	}
+}
+
+void AMainCharacter::ReverseAiming()
+{
+	if (IsLocallyControlled() || HasAuthority()) {
+		Multi_Aim_Implementation(false);
+	}
+	if(!HasAuthority())
+	{
+		Server_Aim(false);
+	}
+}
+
+void AMainCharacter::Multi_Aim_Implementation(const bool bForward)
+{
+	if(bForward)
+	{
+		AimingTimeline.Play();
+	}
+	else
+	{
+		AimingTimeline.Reverse();
+	}
+}
+
+
+void AMainCharacter::TimeLineProgress(const float Value)
+{
+	ADSWeight = Value;
+}
+
 
 
 void AMainCharacter::NextWeapon()
@@ -112,7 +189,7 @@ void AMainCharacter::EquipWeapon(const int32 Index)
 {
 	if (!Weapons.IsValidIndex(Index) || CurrentWeapon == Weapons[Index]) return;
 
-	if (IsLocallyControlled()) {
+	if (IsLocallyControlled() || HasAuthority()) {
 		CurrentIndex = Index;
 
 		const AWeapon* OldWeapon = CurrentWeapon;
@@ -121,7 +198,7 @@ void AMainCharacter::EquipWeapon(const int32 Index)
 
 	}
 
-	else if (!HasAuthority())
+	if (!HasAuthority())
 	{
 		Server_SetCurrentWeapon_Implementation(Weapons[Index]);
 	}

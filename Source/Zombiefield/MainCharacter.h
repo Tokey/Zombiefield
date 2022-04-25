@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/TimelineComponent.h"
 #include "GameFramework/Character.h"
 #include "MainCharacter.generated.h"
 
@@ -24,7 +25,7 @@ protected:
 
 public:	
 	//// Called every frame
-	//virtual void Tick(float DeltaTime) override;
+	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -37,6 +38,9 @@ public:
 
 	virtual void NextWeapon();
 	virtual void PreviousWeapon();
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
+	class USkeletalMeshComponent* ClientMesh;
 
 protected:
 	//Weapon spawned by default
@@ -59,6 +63,37 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Character")
 	virtual void EquipWeapon(const int32 Index);
+
+public:
+	UFUNCTION(BlueprintCallable, Category="Anim")
+	virtual  void StartAiming();
+
+	UFUNCTION(BlueprintCallable, Category="Anim")
+	virtual void ReverseAiming();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category="Anim")
+	float ADSWeight = 0.f;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Configurations|Anim")
+	class UCurveFloat* AimingCurve;
+
+	FTimeline AimingTimeline;
+	
+	UFUNCTION(Server, Reliable)
+	void Server_Aim(const bool bForward = true);
+	virtual FORCEINLINE void Server_Aim_Implementation(const bool bForward)
+	{
+		Multi_Aim(bForward);
+		Multi_Aim_Implementation(bForward);
+	}
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multi_Aim(const bool bForward);
+	virtual void Multi_Aim_Implementation(const bool bForward);
+
+	UFUNCTION()
+	virtual void TimeLineProgress(const float Value);
 
 protected:
 	UFUNCTION()
