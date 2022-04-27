@@ -41,6 +41,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim")
 		FIKProperties IKProperties;
 
+
+	//State
+	UPROPERTY(BlueprintReadOnly, Category="Anim")
+	FRotator LastRotation;
+	
 	//IK Variables
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Anim")
 	FTransform CameraTransform;
@@ -56,4 +61,11 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anim")
 	float ADSWeight = 0.f;
+
+	//Accumulative Offsets
+	UPROPERTY(BlueprintReadWrite, Category="Anim")
+	FRotator AccumulativeRotation;
+
+	UPROPERTY(BlueprintReadWrite, Category="Anim")
+	FRotator AccumulativeRotationInterp;
 };

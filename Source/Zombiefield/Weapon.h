@@ -20,6 +20,9 @@ struct FIKProperties
 		float aimOffset = 15.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float WeightScale = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FTransform customOffsetTransform;
 };
 

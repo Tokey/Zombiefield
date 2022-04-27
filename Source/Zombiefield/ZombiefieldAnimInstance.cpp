@@ -5,6 +5,8 @@
 #include "MainCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Actor.h"
+#include "Kismet/KismetMaterialLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 UZombiefieldAnimInstance::UZombiefieldAnimInstance()
@@ -42,6 +44,8 @@ void UZombiefieldAnimInstance::NativeUpdateAnimation(float DeltaTime)
 
 	SetVariables(DeltaTime);
 	CalculateWeaponSway(DeltaTime);
+
+	LastRotation = CameraTransform.Rotator();
 }
 
 void UZombiefieldAnimInstance::CurrentWeaponChanged(AWeapon* NewWeapon, const AWeapon* OldWeapon)
@@ -64,12 +68,39 @@ void UZombiefieldAnimInstance::SetVariables(const float DeltaTime)
 
 	ADSWeight = Character->ADSWeight;
 	
-	//RHandToSightTransform = 
+	//Offsets
+
+	//Accumulative Rotation
+	constexpr float AngleClamp = 6.f;
+	const FRotator& AddRotation = CameraTransform.Rotator() -LastRotation;
+	FRotator AddRotationClamped = FRotator(FMath::ClampAngle(AddRotation.Pitch, -AngleClamp, AngleClamp)*1.5,
+		FMath::ClampAngle(AddRotation.Yaw, -AngleClamp, AngleClamp), 0);
+	AddRotationClamped.Roll = AddRotationClamped.Yaw * .7f;
+
+	AccumulativeRotation += AddRotationClamped;
+	AccumulativeRotation = UKismetMathLibrary::RInterpTo(AccumulativeRotation, FRotator::ZeroRotator, DeltaTime, 30.f);
+	AccumulativeRotationInterp = UKismetMathLibrary::RInterpTo(AccumulativeRotationInterp, AccumulativeRotation, DeltaTime, 5.);
+	
 }
 
 void UZombiefieldAnimInstance::CalculateWeaponSway(const float DeltaTime)
 {
+	FVector LocationOffset = FVector::ZeroVector;
+	FRotator RotationOffset = FRotator::ZeroRotator;
+
+	const FRotator& AccumulativeRotationInterpInverse = AccumulativeRotationInterp.GetInverse();
+	RotationOffset += AccumulativeRotationInterpInverse;
+
 	
+	LocationOffset += FVector(0.f, AccumulativeRotationInterpInverse.Yaw, AccumulativeRotationInterpInverse.Pitch)/6.f;
+
+	LocationOffset *= IKProperties.WeightScale;
+
+	RotationOffset.Pitch *= IKProperties.WeightScale;
+	RotationOffset.Yaw *= IKProperties.WeightScale;
+	RotationOffset.Roll *= IKProperties.WeightScale;
+
+	OffsetTransform = FTransform(RotationOffset, LocationOffset);
 }
 
 void UZombiefieldAnimInstance::SetIKTransforms()

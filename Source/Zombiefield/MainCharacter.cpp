@@ -82,8 +82,14 @@ void AMainCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 	DOREPLIFETIME_CONDITION(AMainCharacter, Weapons, COND_None);
 	DOREPLIFETIME_CONDITION(AMainCharacter, CurrentWeapon, COND_None);
+	DOREPLIFETIME_CONDITION(AMainCharacter, ADSWeight, COND_None);
 }
 
+void AMainCharacter::PreReplication(IRepChangedPropertyTracker& ChangedPropertyTracker)
+{
+	Super::PreReplication(ChangedPropertyTracker);
+	DOREPLIFETIME_ACTIVE_OVERRIDE(AMainCharacter, ADSWeight, ADSWeight >= 1.f || ADSWeight<=0.f);
+}
 
 
 // Called every frame
@@ -133,7 +139,7 @@ void AMainCharacter::MoveRight(float Value)
 void AMainCharacter::StartAiming()
 {
 	if (IsLocallyControlled() || HasAuthority()) {
-		Multi_Aim_Implementation(true);
+		Multi_Aim(true);
 	}
 	if(!HasAuthority())
 	{
@@ -144,7 +150,7 @@ void AMainCharacter::StartAiming()
 void AMainCharacter::ReverseAiming()
 {
 	if (IsLocallyControlled() || HasAuthority()) {
-		Multi_Aim_Implementation(false);
+		Multi_Aim(false);
 	}
 	if(!HasAuthority())
 	{
@@ -200,7 +206,7 @@ void AMainCharacter::EquipWeapon(const int32 Index)
 
 	if (!HasAuthority())
 	{
-		Server_SetCurrentWeapon_Implementation(Weapons[Index]);
+		Server_SetCurrentWeapon(Weapons[Index]);
 	}
 }
 void AMainCharacter::Server_SetCurrentWeapon_Implementation(class AWeapon* NewWeapon)
