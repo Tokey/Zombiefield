@@ -2,11 +2,15 @@
 
 
 #include "ZombiefieldAnimInstance.h"
+
+#include <string>
+
 #include "MainCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Actor.h"
 #include "Kismet/KismetMaterialLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "EngineGlobals.h"
 
 
 UZombiefieldAnimInstance::UZombiefieldAnimInstance()
@@ -46,6 +50,7 @@ void UZombiefieldAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	CalculateWeaponSway(DeltaTime);
 
 	LastRotation = CameraTransform.Rotator();
+	LastLocation = Character->GetTransform().GetLocation();
 }
 
 void UZombiefieldAnimInstance::CurrentWeaponChanged(AWeapon* NewWeapon, const AWeapon* OldWeapon)
@@ -80,7 +85,19 @@ void UZombiefieldAnimInstance::SetVariables(const float DeltaTime)
 	AccumulativeRotation += AddRotationClamped;
 	AccumulativeRotation = UKismetMathLibrary::RInterpTo(AccumulativeRotation, FRotator::ZeroRotator, DeltaTime, 30.f);
 	AccumulativeRotationInterp = UKismetMathLibrary::RInterpTo(AccumulativeRotationInterp, AccumulativeRotation, DeltaTime, 5.);
+	//Accumulative Location
+	constexpr float LocationClamp = 6.f;
+	const FVector& AddLocation = Character->GetTransform().GetLocation() -LastLocation;
 	
+	FVector AddLocationClamped = FVector(FMath::Clamp(-AddLocation.X, -AngleClamp, AngleClamp),
+		FMath::Clamp(-AddLocation.Y, -AngleClamp, AngleClamp), 0);
+	if(GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow,
+		                                 FString::Printf(TEXT("World delta for current frame equals %f"), AddLocation.X));	
+
+	AccumulativeLocation += AddLocationClamped;
+	AccumulativeLocation = UKismetMathLibrary::VInterpTo(AccumulativeLocation, FVector::ZeroVector, DeltaTime, 30.f);
+	AccumulativeLocationInterp = UKismetMathLibrary::VInterpTo(AccumulativeLocationInterp, AccumulativeLocation, DeltaTime, 5.);
 }
 
 void UZombiefieldAnimInstance::CalculateWeaponSway(const float DeltaTime)
@@ -93,7 +110,7 @@ void UZombiefieldAnimInstance::CalculateWeaponSway(const float DeltaTime)
 
 	
 	LocationOffset += FVector(0.f, AccumulativeRotationInterpInverse.Yaw, AccumulativeRotationInterpInverse.Pitch)/6.f;
-
+	//LocationOffset += FVector(AccumulativeLocationInterp.X, AccumulativeLocationInterp.Y, AccumulativeLocationInterp.Z);
 	LocationOffset *= IKProperties.WeightScale;
 
 	RotationOffset.Pitch *= IKProperties.WeightScale;

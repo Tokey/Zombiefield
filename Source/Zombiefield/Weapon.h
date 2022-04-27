@@ -6,8 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "Weapon.generated.h"
 
-
-
 USTRUCT(BlueprintType)
 struct FIKProperties
 {

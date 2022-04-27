@@ -14,7 +14,6 @@ class ZOMBIEFIELD_API UZombiefieldAnimInstance : public UAnimInstance
 
 public:
 	UZombiefieldAnimInstance();
-	
 
 protected:
 	virtual void NativeBeginPlay() override;
@@ -46,6 +45,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category="Anim")
 	FRotator LastRotation;
 	
+	UPROPERTY(BlueprintReadOnly, Category="Anim")
+	FVector LastLocation;
+	
 	//IK Variables
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Anim")
 	FTransform CameraTransform;
@@ -68,4 +70,10 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, Category="Anim")
 	FRotator AccumulativeRotationInterp;
+
+	UPROPERTY(BlueprintReadWrite, Category="Anim")
+	FVector AccumulativeLocation;
+
+	UPROPERTY(BlueprintReadWrite, Category="Anim")
+	FVector AccumulativeLocationInterp;
 };
