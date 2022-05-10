@@ -13,8 +13,10 @@
 #include "EngineGlobals.h"
 
 
-UZombiefieldAnimInstance::UZombiefieldAnimInstance()
+UZombiefieldAnimInstance::UZombiefieldAnimInstance():
+EMovementEnums(EMovement::EMIdle)
 {
+	
 }
 
 void UZombiefieldAnimInstance::NativeBeginPlay()
@@ -51,6 +53,8 @@ void UZombiefieldAnimInstance::NativeUpdateAnimation(float DeltaTime)
 
 	LastRotation = CameraTransform.Rotator();
 	LastLocation = Character->GetTransform().GetLocation();
+	IsFiring = Character->IsFiring;
+	EMovementEnums =  Character->EMovementEnumsMain;
 }
 
 void UZombiefieldAnimInstance::CurrentWeaponChanged(AWeapon* NewWeapon, const AWeapon* OldWeapon)
@@ -91,9 +95,9 @@ void UZombiefieldAnimInstance::SetVariables(const float DeltaTime)
 	
 	FVector AddLocationClamped = FVector(FMath::Clamp(-AddLocation.X, -AngleClamp, AngleClamp),
 		FMath::Clamp(-AddLocation.Y, -AngleClamp, AngleClamp), 0);
-	if(GEngine)
+	/*if(GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow,
-		                                 FString::Printf(TEXT("World delta for current frame equals %f"), AddLocation.X));	
+		                                 FString::Printf(TEXT("World delta for current frame equals %f"), AddLocation.X));	*/
 
 	AccumulativeLocation += AddLocationClamped;
 	AccumulativeLocation = UKismetMathLibrary::VInterpTo(AccumulativeLocation, FVector::ZeroVector, DeltaTime, 30.f);

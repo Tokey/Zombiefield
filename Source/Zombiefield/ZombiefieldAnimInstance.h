@@ -7,6 +7,22 @@
 #include "Weapon.h"
 #include "ZombiefieldAnimInstance.generated.h"
 
+UENUM(BlueprintType)
+enum class EMovement : uint8
+{
+	EMForward UMETA(DisplayName = "Forward"),
+	EMBackward UMETA(DisplayName = "Backward"),
+	EMLeft UMETA(DisplayName = "Left"),
+	EMRight UMETA(DisplayName = "Right"),
+
+	EMForwardSprint UMETA(DisplayName = "ForwardSprint"),
+	EMBackwardSprint UMETA(DisplayName = "BackwardSprint"),
+	EMLeftSprint UMETA(DisplayName = "LeftSprint"),
+	EMRightSprint UMETA(DisplayName = "RightSprint"),
+	
+	EMIdle UMETA (DisplayName = "Idle")
+};
+
 UCLASS()
 class ZOMBIEFIELD_API UZombiefieldAnimInstance : public UAnimInstance
 {
@@ -14,8 +30,10 @@ class ZOMBIEFIELD_API UZombiefieldAnimInstance : public UAnimInstance
 
 public:
 	UZombiefieldAnimInstance();
+	
 
 protected:
+	
 	virtual void NativeBeginPlay() override;
 	virtual void NativeUpdateAnimation(float DeltaTime) override;
 	UFUNCTION()
@@ -26,7 +44,7 @@ protected:
 
 	virtual void SetIKTransforms();
 public:
-
+	
 	// References
 	UPROPERTY(BlueprintReadWrite, Category = "Anim")
 		class AMainCharacter* Character;
@@ -76,4 +94,10 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, Category="Anim")
 	FVector AccumulativeLocationInterp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anim")
+	bool IsFiring;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anim")
+	EMovement EMovementEnums;
 };

@@ -13,18 +13,18 @@ AWeapon::AWeapon()
 
 	SetReplicates(true);
 
-	root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-	RootComponent = root;
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	RootComponent = Root;
 
-	mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
-	mesh->SetupAttachment(root);
+	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
+	Mesh->SetupAttachment(Root);
 }
 
 // Called when the game starts or when spawned
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
-	if(!currentOwner)
-		mesh->SetVisibility(false);
+	if(!CurrentOwner)
+		Mesh->SetVisibility(false);
 }
 

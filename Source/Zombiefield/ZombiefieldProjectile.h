@@ -30,9 +30,6 @@ class AZombiefieldProjectile : public AActor
 
 	FTimerHandle MemberTimerHandle;
 
-
-	
-
 public:
 	AZombiefieldProjectile();
 	/** called when projectile hits something */

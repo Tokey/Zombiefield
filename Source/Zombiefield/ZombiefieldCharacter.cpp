@@ -118,7 +118,7 @@ void AZombiefieldCharacter::OnFire(float firePressed)
 	{
 		fired -= deltaTime;
 
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("Firing %f"), deltaTime));
+		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("Firing %f"), deltaTime));
 		if (fired <= 0)
 		{
 			fired = fireRate;
