@@ -43,6 +43,9 @@ public:
 	void OnFire(float FirePressed);
 	void StartSprint();
 	void StopSprint();
+	void InterpFinalRecoil(float DeltaTime);
+	void InterpRecoil(float DeltaTime);
+	void Shoot();
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
 	class USkeletalMeshComponent* ClientMesh;
@@ -55,6 +58,10 @@ public:
 	bool IsWalkingForward;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Mesh)
 	bool IsWalkingBackward;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Recoil)
+    	FTransform RecoilTransform;
+    	FTransform FinalRecoilTransform;
 
 protected:
 	//Weapon spawned by default
@@ -89,8 +96,6 @@ public:
 	float ADSWeight = 0.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anim")
 	EMovement EMovementEnumsMain;
-	
-	
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Configurations|Anim")
@@ -113,9 +118,7 @@ protected:
 
 	UFUNCTION()
 	virtual void TimeLineProgress(const float Value);
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	UAnimMontage* FireAnimation;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
 	FVector GunOffset;
 	

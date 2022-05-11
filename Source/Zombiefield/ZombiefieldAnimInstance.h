@@ -100,4 +100,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anim")
 	EMovement EMovementEnums;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Recoil)
+	FTransform RecoilTransformIK;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Recoil)
+	FRotator RecoilRotationIK;
 };

@@ -8,6 +8,7 @@
 #include "Runtime/Engine/Public/Net/UnrealNetwork.h"
 #include "ZombiefieldProjectile.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 float FireRate;
@@ -24,6 +25,7 @@ AMainCharacter::AMainCharacter()
 {
 	
 	Fired = FireRate;
+	
 
 	DefaultWalkSpeed = 600;
 	SprintingSpeed = 1000;
@@ -98,7 +100,7 @@ void AMainCharacter::BeginPlay()
 			{
 				CurrentWeapon = spawnedWeapon;
 				OnRep_CurrentWeapon(nullptr);
-				FireRate = 1/CurrentWeapon->FireRate;
+				FireRate = (1/CurrentWeapon->FireRate)*60;
 			}
 		}
 	}
@@ -126,6 +128,8 @@ void AMainCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	AimingTimeline.TickTimeline(DeltaTime);
+	InterpFinalRecoil(DeltaTime);
+	InterpRecoil(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -259,7 +263,7 @@ void AMainCharacter::NextWeapon()
 {
 	const int32 Index = Weapons.IsValidIndex(CurrentIndex + 1) ? CurrentIndex + 1 : 0;
 	EquipWeapon(Index);
-	FireRate = 1/CurrentWeapon->FireRate;
+	FireRate = (1/CurrentWeapon->FireRate)*60;
 
 }
 
@@ -267,7 +271,7 @@ void AMainCharacter::PreviousWeapon()
 {
 	const int32 Index = Weapons.IsValidIndex(CurrentIndex - 1) ? CurrentIndex - 1 : Weapons.Num() - 1;
 	EquipWeapon(Index);
-	FireRate = 1/CurrentWeapon->FireRate;
+	FireRate = (1/CurrentWeapon->FireRate)*60;
 }
 
 void AMainCharacter::EquipWeapon(const int32 Index)
@@ -326,7 +330,7 @@ void AMainCharacter::OnFire(float FirePressed)
 		IsFiring = true;
 		Fired -= GetWorld()->DeltaTimeSeconds;
 		//AnimInstance->IsFiring = true;
-		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("Firing %f"), deltaTime));
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("Firing %f"), FireRate));
 		if (Fired <= 0)
 		{
 			Fired = FireRate;
@@ -335,13 +339,18 @@ void AMainCharacter::OnFire(float FirePressed)
 				UWorld* const World = GetWorld();
 				if (World != nullptr)
 				{
-					const FRotator SpawnRotation = CurrentWeapon->Mesh->GetSocketRotation("MuzzleFlash");
+					Shoot();
+					FRotator SpawnRotation = CurrentWeapon->Mesh->GetSocketRotation("MuzzleFlash");
 					// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
 					FVector SpawnLocation;
 					if(!IsAiming)
 						SpawnLocation = ((CurrentWeapon != nullptr) ? CurrentWeapon->Mesh->GetSocketLocation("MuzzleFlash") : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
 					else
+					{
+						SpawnRotation = CurrentWeapon->Mesh->GetSocketRotation("ADS");
 						SpawnLocation =((CurrentWeapon != nullptr) ? CurrentWeapon->Mesh->GetSocketLocation("ADS") : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
+					}
+						
 					//Set Spawn Collision Handling Override
 					FActorSpawnParameters ActorSpawnParams;
 					ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
@@ -378,6 +387,29 @@ void AMainCharacter::StopSprint()
 	playerController->MaxWalkSpeed = DefaultWalkSpeed;
 	IsSprinting = false;
 	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("WalkSpeed %f"), playerController->MaxWalkSpeed));
+}
+
+void AMainCharacter::InterpFinalRecoil(float DeltaTime)
+{
+	FinalRecoilTransform = UKismetMathLibrary::TInterpTo(FinalRecoilTransform, FTransform(), DeltaTime,10.f);
+	
+}
+
+void AMainCharacter::InterpRecoil(float DeltaTime)
+{
+	RecoilTransform = UKismetMathLibrary::TInterpTo(RecoilTransform, FinalRecoilTransform, DeltaTime,10.f);
+}
+
+void AMainCharacter::Shoot()
+{
+
+	FVector RecoilVector = FinalRecoilTransform.GetLocation();
+	RecoilVector += FVector(FMath::RandRange(-7.0,-1.0),FMath::RandRange(-1.0,1.0), FMath::RandRange(-0.3,0.3));
+	
+	FRotator RecoilRot = FinalRecoilTransform.GetRotation().Rotator();
+	RecoilRot+=	FRotator(FMath::RandRange(-7.0,-1.0), FMath::RandRange(-1.0,1.0), FMath::RandRange(-6.0,6.0));
+	FinalRecoilTransform.SetRotation(RecoilRot.Quaternion());
+	FinalRecoilTransform.SetLocation(RecoilVector);
 }
 
 

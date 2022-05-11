@@ -55,6 +55,8 @@ void UZombiefieldAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	LastLocation = Character->GetTransform().GetLocation();
 	IsFiring = Character->IsFiring;
 	EMovementEnums =  Character->EMovementEnumsMain;
+	RecoilTransformIK = Character->RecoilTransform;
+	RecoilRotationIK = RecoilTransformIK.GetRotation().Rotator();
 }
 
 void UZombiefieldAnimInstance::CurrentWeaponChanged(AWeapon* NewWeapon, const AWeapon* OldWeapon)
