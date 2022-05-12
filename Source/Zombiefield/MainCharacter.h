@@ -80,7 +80,7 @@ public:
 	FCurrentWeaponChangedDelegate CurrentWeaponChangedDelegate;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Replicated, Category = "State")
-	int32 CurrentIndex =0;
+	int32 CurrentIndex = 0;
 
 	UFUNCTION(BlueprintCallable, Category="Character")
 	virtual void EquipWeapon(const int32 Index);
@@ -121,6 +121,8 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
 	FVector GunOffset;
+
+	
 	
 
 protected:

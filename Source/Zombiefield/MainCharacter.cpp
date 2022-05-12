@@ -23,16 +23,16 @@ bool IsSprinting;
 // Sets default values
 AMainCharacter::AMainCharacter()
 {
-	
+
 	Fired = FireRate;
-	
+
 
 	DefaultWalkSpeed = 600;
 	SprintingSpeed = 1000;
 
 	playerController = GetCharacterMovement();
 	playerController->MaxWalkSpeed = DefaultWalkSpeed;
-	
+
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -47,7 +47,7 @@ AMainCharacter::AMainCharacter()
 	ClientMesh->bVisibleInReflectionCaptures = false;
 	ClientMesh->SetTickGroup(ETickingGroup::TG_PostUpdateWork);
 	ClientMesh->SetupAttachment(GetMesh());
-	
+
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->bUsePawnControlRotation = true;
 	Camera->SetupAttachment(GetMesh(), FName("Head"));
@@ -61,20 +61,20 @@ void AMainCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+
 	// Setup ADS timeline
-	if(AimingCurve)
+	if (AimingCurve)
 	{
 		FOnTimelineFloat TimelineFloat;
 		TimelineFloat.BindDynamic(this, &AMainCharacter::TimeLineProgress);
 
 		AimingTimeline.AddInterpFloat(AimingCurve, TimelineFloat);
 	}
-	
-	
-	
+
+
+
 	// Client Mesh logic
-	if(IsLocallyControlled())
+	if (IsLocallyControlled())
 	{
 		ClientMesh->HideBoneByName(FName("neck_01"), EPhysBodyOp::PBO_None);
 		GetMesh()->SetVisibility(false);
@@ -100,7 +100,7 @@ void AMainCharacter::BeginPlay()
 			{
 				CurrentWeapon = spawnedWeapon;
 				OnRep_CurrentWeapon(nullptr);
-				FireRate = (1/CurrentWeapon->FireRate)*60;
+				FireRate = (1 / CurrentWeapon->FireRate) * 60;
 			}
 		}
 	}
@@ -118,7 +118,7 @@ void AMainCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 void AMainCharacter::PreReplication(IRepChangedPropertyTracker& ChangedPropertyTracker)
 {
 	Super::PreReplication(ChangedPropertyTracker);
-	DOREPLIFETIME_ACTIVE_OVERRIDE(AMainCharacter, ADSWeight, ADSWeight >= 1.f || ADSWeight<=0.f);
+	DOREPLIFETIME_ACTIVE_OVERRIDE(AMainCharacter, ADSWeight, ADSWeight >= 1.f || ADSWeight <= 0.f);
 }
 
 
@@ -139,7 +139,7 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	PlayerInputComponent->BindAction("Aim", EInputEvent::IE_Pressed, this, &AMainCharacter::StartAiming);
 	PlayerInputComponent->BindAction("Aim", EInputEvent::IE_Released, this, &AMainCharacter::ReverseAiming);
-	
+
 	PlayerInputComponent->BindAction("NextWeapon", EInputEvent::IE_Pressed, this, &AMainCharacter::NextWeapon);
 	PlayerInputComponent->BindAction("PreviousWeapon", EInputEvent::IE_Pressed, this, &AMainCharacter::PreviousWeapon);
 
@@ -153,7 +153,7 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
 	PlayerInputComponent->BindAxis("Fire", this, &AMainCharacter::OnFire);
-	
+
 }
 
 void AMainCharacter::MoveForward(float Value)
@@ -161,25 +161,25 @@ void AMainCharacter::MoveForward(float Value)
 	if (Value != 0.0f)
 	{
 		IsWalking = true;
-		if(Value == 1.0)
+		if (Value == 1.0)
 		{
-			if(!IsSprinting)
-			EMovementEnumsMain = EMovement::EMForward;
+			if (!IsSprinting)
+				EMovementEnumsMain = EMovement::EMForward;
 			else
 				EMovementEnumsMain = EMovement::EMForwardSprint;
 		}
-		else if(Value==-1.0)
+		else if (Value == -1.0)
 		{
-			if(!IsSprinting)
-			EMovementEnumsMain = EMovement::EMBackward;
+			if (!IsSprinting)
+				EMovementEnumsMain = EMovement::EMBackward;
 			else
 				EMovementEnumsMain = EMovement::EMBackwardSprint;
-			
+
 		}
 		// add movement in that direction
 		AddMovementInput(GetActorForwardVector(), Value);
 	}
-	else if(Value==0.0)
+	else if (Value == 0.0)
 	{
 		IsWalking = false;
 	}
@@ -190,28 +190,28 @@ void AMainCharacter::MoveRight(float Value)
 	if (Value != 0.0f)
 	{
 		IsStrafing = true;
-		if(Value == 1.0)
+		if (Value == 1.0)
 		{
-			if(!IsSprinting)
-			EMovementEnumsMain = EMovement::EMRight;
+			if (!IsSprinting)
+				EMovementEnumsMain = EMovement::EMRight;
 			else
 				EMovementEnumsMain = EMovement::EMRightSprint;
 		}
-		else if(Value==-1.0)
+		else if (Value == -1.0)
 		{
-			if(!IsSprinting)
-			EMovementEnumsMain = EMovement::EMLeft;
+			if (!IsSprinting)
+				EMovementEnumsMain = EMovement::EMLeft;
 			else
 				EMovementEnumsMain = EMovement::EMLeftSprint;
 		}
 		// add movement in that direction
 		AddMovementInput(GetActorRightVector(), Value);
 	}
-	else if(Value==0.0)
+	else if (Value == 0.0)
 	{
 		IsStrafing = false;
 	}
-	if(!IsStrafing && !IsWalking)
+	if (!IsStrafing && !IsWalking)
 		EMovementEnumsMain = EMovement::EMIdle;
 }
 
@@ -221,7 +221,7 @@ void AMainCharacter::StartAiming()
 	if (IsLocallyControlled() || HasAuthority()) {
 		Multi_Aim(true);
 	}
-	if(!HasAuthority())
+	if (!HasAuthority())
 	{
 		Server_Aim(true);
 	}
@@ -233,7 +233,7 @@ void AMainCharacter::ReverseAiming()
 	if (IsLocallyControlled() || HasAuthority()) {
 		Multi_Aim(false);
 	}
-	if(!HasAuthority())
+	if (!HasAuthority())
 	{
 		Server_Aim(false);
 	}
@@ -241,7 +241,7 @@ void AMainCharacter::ReverseAiming()
 
 void AMainCharacter::Multi_Aim_Implementation(const bool bForward)
 {
-	if(bForward)
+	if (bForward)
 	{
 		AimingTimeline.Play();
 	}
@@ -263,7 +263,7 @@ void AMainCharacter::NextWeapon()
 {
 	const int32 Index = Weapons.IsValidIndex(CurrentIndex + 1) ? CurrentIndex + 1 : 0;
 	EquipWeapon(Index);
-	FireRate = (1/CurrentWeapon->FireRate)*60;
+	FireRate = (1 / CurrentWeapon->FireRate) * 60;
 
 }
 
@@ -271,7 +271,7 @@ void AMainCharacter::PreviousWeapon()
 {
 	const int32 Index = Weapons.IsValidIndex(CurrentIndex - 1) ? CurrentIndex - 1 : Weapons.Num() - 1;
 	EquipWeapon(Index);
-	FireRate = (1/CurrentWeapon->FireRate)*60;
+	FireRate = (1 / CurrentWeapon->FireRate) * 60;
 }
 
 void AMainCharacter::EquipWeapon(const int32 Index)
@@ -309,7 +309,7 @@ void AMainCharacter::OnRep_CurrentWeapon(const AWeapon* OldWeapon)
 			CurrentWeapon->SetActorTransform(placementTransform, false, nullptr, ETeleportType::TeleportPhysics);
 			CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, FName("Weapon_R"));
 
-			
+
 			CurrentWeapon->CurrentOwner = this;
 		}
 		CurrentWeapon->Mesh->SetVisibility(true);
@@ -319,7 +319,7 @@ void AMainCharacter::OnRep_CurrentWeapon(const AWeapon* OldWeapon)
 		OldWeapon->Mesh->SetVisibility(false);
 	}
 
-	CurrentWeaponChangedDelegate.Broadcast(CurrentWeapon,OldWeapon);
+	CurrentWeaponChangedDelegate.Broadcast(CurrentWeapon, OldWeapon);
 }
 
 void AMainCharacter::OnFire(float FirePressed)
@@ -327,12 +327,13 @@ void AMainCharacter::OnFire(float FirePressed)
 
 	if (FirePressed == 1.0)
 	{
-		IsFiring = true;
+		
 		Fired -= GetWorld()->DeltaTimeSeconds;
 		//AnimInstance->IsFiring = true;
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("Firing %f"), FireRate));
+		
 		if (Fired <= 0)
 		{
+			IsFiring = true;
 			Fired = FireRate;
 			if (CurrentWeapon->BulletClass != nullptr)
 			{
@@ -343,14 +344,14 @@ void AMainCharacter::OnFire(float FirePressed)
 					FRotator SpawnRotation = CurrentWeapon->Mesh->GetSocketRotation("MuzzleFlash");
 					// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
 					FVector SpawnLocation;
-					if(!IsAiming)
+					if (!IsAiming)
 						SpawnLocation = ((CurrentWeapon != nullptr) ? CurrentWeapon->Mesh->GetSocketLocation("MuzzleFlash") : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
 					else
 					{
 						SpawnRotation = CurrentWeapon->Mesh->GetSocketRotation("ADS");
-						SpawnLocation =((CurrentWeapon != nullptr) ? CurrentWeapon->Mesh->GetSocketLocation("ADS") : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
+						SpawnLocation = ((CurrentWeapon != nullptr) ? CurrentWeapon->Mesh->GetSocketLocation("ADS") : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
 					}
-						
+
 					//Set Spawn Collision Handling Override
 					FActorSpawnParameters ActorSpawnParams;
 					ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
@@ -391,23 +392,32 @@ void AMainCharacter::StopSprint()
 
 void AMainCharacter::InterpFinalRecoil(float DeltaTime)
 {
-	FinalRecoilTransform = UKismetMathLibrary::TInterpTo(FinalRecoilTransform, FTransform(), DeltaTime,10.f);
-	
+	if (IsAiming)
+		FinalRecoilTransform = UKismetMathLibrary::TInterpTo(FinalRecoilTransform, FTransform(), DeltaTime, CurrentWeapon->RecoilCompensationStrength * 2);
+	else
+		FinalRecoilTransform = UKismetMathLibrary::TInterpTo(FinalRecoilTransform, FTransform(), DeltaTime, CurrentWeapon->RecoilCompensationStrength);
 }
 
 void AMainCharacter::InterpRecoil(float DeltaTime)
 {
-	RecoilTransform = UKismetMathLibrary::TInterpTo(RecoilTransform, FinalRecoilTransform, DeltaTime,10.f);
+	if (IsAiming)
+		RecoilTransform = UKismetMathLibrary::TInterpTo(RecoilTransform, FinalRecoilTransform, DeltaTime, CurrentWeapon->RecoilCompensationStrength * 2);
+	else
+		RecoilTransform = UKismetMathLibrary::TInterpTo(RecoilTransform, FinalRecoilTransform, DeltaTime, CurrentWeapon->RecoilCompensationStrength);
 }
 
 void AMainCharacter::Shoot()
 {
 
 	FVector RecoilVector = FinalRecoilTransform.GetLocation();
-	RecoilVector += FVector(FMath::RandRange(-7.0,-1.0),FMath::RandRange(-1.0,1.0), FMath::RandRange(-0.3,0.3));
-	
+	RecoilVector += FVector(FMath::RandRange(-CurrentWeapon->RecoilStrength, -CurrentWeapon->RecoilStrength / 7),
+		FMath::RandRange(-CurrentWeapon->RecoilStrength / 7, CurrentWeapon->RecoilStrength / 7),
+		FMath::RandRange(-CurrentWeapon->RecoilStrength / 21, CurrentWeapon->RecoilStrength / 21));
+
 	FRotator RecoilRot = FinalRecoilTransform.GetRotation().Rotator();
-	RecoilRot+=	FRotator(FMath::RandRange(-7.0,-1.0), FMath::RandRange(-1.0,1.0), FMath::RandRange(-6.0,6.0));
+	RecoilRot += FRotator(FMath::RandRange(-CurrentWeapon->RecoilStrength, -CurrentWeapon->RecoilStrength / 7),
+		FMath::RandRange(-CurrentWeapon->RecoilStrength / 7, CurrentWeapon->RecoilStrength / 7),
+		FMath::RandRange(-CurrentWeapon->RecoilStrength / 1.1, CurrentWeapon->RecoilStrength / 1.1));
 	FinalRecoilTransform.SetRotation(RecoilRot.Quaternion());
 	FinalRecoilTransform.SetLocation(RecoilVector);
 }

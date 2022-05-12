@@ -63,6 +63,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configurations")
 		FTransform placementTransform;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	float RecoilStrength;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		float RecoilCompensationStrength;
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="IK")
 	FTransform GetSightsWorldTransform() const;
 	virtual FTransform GetSightsWorldTransform_Implementation() const {return Mesh->GetSocketTransform(FName("Sights"));}
