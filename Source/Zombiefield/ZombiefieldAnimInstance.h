@@ -19,6 +19,8 @@ enum class EMovement : uint8
 	EMBackwardSprint UMETA(DisplayName = "BackwardSprint"),
 	EMLeftSprint UMETA(DisplayName = "LeftSprint"),
 	EMRightSprint UMETA(DisplayName = "RightSprint"),
+
+	EMReload UMETA(DisplayName = "Reload"),
 	
 	EMIdle UMETA (DisplayName = "Idle")
 };

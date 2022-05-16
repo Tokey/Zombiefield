@@ -196,13 +196,13 @@ void AZombiefieldCharacter::LookUpAtRate(float Rate)
 void AZombiefieldCharacter::Sprint()
 {
 	playerController->MaxWalkSpeed = sprintingSpeed;
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("SprintSpeed %f"), playerController->MaxWalkSpeed));
+	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("SprintSpeed %f"), playerController->MaxWalkSpeed));
 }
 
 void AZombiefieldCharacter::StopSprint()
 {
 	playerController->MaxWalkSpeed = defaultWalkSpeed;
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("WalkSpeed %f"), playerController->MaxWalkSpeed));
+	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("WalkSpeed %f"), playerController->MaxWalkSpeed));
 }
 
 void AZombiefieldCharacter::Tick(float DeltaTime)

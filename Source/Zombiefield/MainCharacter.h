@@ -41,6 +41,7 @@ public:
 	virtual void NextWeapon();
 	virtual void PreviousWeapon();
 	void OnFire(float FirePressed);
+	void OnReload(float RealoadPressed);
 	void StartSprint();
 	void StopSprint();
 	void InterpFinalRecoil(float DeltaTime);

@@ -13,9 +13,11 @@
 
 float FireRate;
 float Fired;
+float ReloadDurationTicker;
 bool IsAiming;
 bool IsStrafing;
 bool IsWalking;
+bool IsReloading;
 float DefaultWalkSpeed;
 float SprintingSpeed;
 
@@ -153,6 +155,7 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
 	PlayerInputComponent->BindAxis("Fire", this, &AMainCharacter::OnFire);
+	PlayerInputComponent->BindAxis("REload", this, &AMainCharacter::OnReload);
 
 }
 
@@ -163,16 +166,16 @@ void AMainCharacter::MoveForward(float Value)
 		IsWalking = true;
 		if (Value == 1.0)
 		{
-			if (!IsSprinting)
+			if (!IsSprinting && !IsReloading)
 				EMovementEnumsMain = EMovement::EMForward;
-			else
+			else if(!IsReloading)
 				EMovementEnumsMain = EMovement::EMForwardSprint;
 		}
 		else if (Value == -1.0)
 		{
-			if (!IsSprinting)
+			if (!IsSprinting && !IsReloading)
 				EMovementEnumsMain = EMovement::EMBackward;
-			else
+			else if(!IsReloading)
 				EMovementEnumsMain = EMovement::EMBackwardSprint;
 
 		}
@@ -192,16 +195,16 @@ void AMainCharacter::MoveRight(float Value)
 		IsStrafing = true;
 		if (Value == 1.0)
 		{
-			if (!IsSprinting)
+			if (!IsSprinting && !IsReloading)
 				EMovementEnumsMain = EMovement::EMRight;
-			else
+			else if(!IsReloading)
 				EMovementEnumsMain = EMovement::EMRightSprint;
 		}
 		else if (Value == -1.0)
 		{
-			if (!IsSprinting)
+			if (!IsSprinting && !IsReloading)
 				EMovementEnumsMain = EMovement::EMLeft;
-			else
+			else if(!IsReloading)
 				EMovementEnumsMain = EMovement::EMLeftSprint;
 		}
 		// add movement in that direction
@@ -211,7 +214,7 @@ void AMainCharacter::MoveRight(float Value)
 	{
 		IsStrafing = false;
 	}
-	if (!IsStrafing && !IsWalking)
+	if (!IsStrafing && !IsWalking && !IsReloading)
 		EMovementEnumsMain = EMovement::EMIdle;
 }
 
@@ -331,8 +334,9 @@ void AMainCharacter::OnFire(float FirePressed)
 		Fired -= GetWorld()->DeltaTimeSeconds;
 		//AnimInstance->IsFiring = true;
 		
-		if (Fired <= 0)
+		if (Fired <= 0 && CurrentWeapon->WeaponAmmo.CurrentAmmoSize>0 && !IsReloading)
 		{
+			CurrentWeapon->WeaponAmmo.CurrentAmmoSize--;
 			IsFiring = true;
 			Fired = FireRate;
 			if (CurrentWeapon->BulletClass != nullptr)
@@ -374,6 +378,25 @@ void AMainCharacter::OnFire(float FirePressed)
 		//AnimInstance->IsFiring = false;
 		Fired = 0;
 	}
+}
+
+void AMainCharacter::OnReload(float RealoadPressed)
+{
+	if(IsReloading)
+		ReloadDurationTicker -= GetWorld()->DeltaTimeSeconds;
+	if (ReloadDurationTicker <= 0)
+		IsReloading = false;
+	if (RealoadPressed == 1.0f)
+	{
+		if (!IsReloading && CurrentWeapon->WeaponAmmo.CurrentAmmoSize < CurrentWeapon->WeaponAmmo.ClipSize && ReloadDurationTicker == CurrentWeapon->WeaponAmmo.ReloadDuration)
+		{
+			IsReloading = true;
+			EMovementEnumsMain = EMovement::EMReload;
+			CurrentWeapon->WeaponAmmo.CurrentAmmoSize = CurrentWeapon->WeaponAmmo.ClipSize;
+		}
+	}
+	else if(!IsReloading)
+		ReloadDurationTicker = CurrentWeapon->WeaponAmmo.ReloadDuration;
 }
 
 void AMainCharacter::StartSprint()

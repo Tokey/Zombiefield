@@ -24,6 +24,20 @@ struct FIKProperties
 		FTransform customOffsetTransform;
 };
 
+USTRUCT(BlueprintType)
+struct FAmmo
+{
+	GENERATED_BODY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int ClipSize = 30;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int CurrentAmmoSize = 30;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int NumberOfMags = 8;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float ReloadDuration = 2;
+};
+
 UCLASS()
 class ZOMBIEFIELD_API AWeapon : public AActor
 {
@@ -59,6 +73,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configurations")
 		FIKProperties iKProperties;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configurations")
+		FAmmo WeaponAmmo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configurations")
 		FTransform placementTransform;
