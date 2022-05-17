@@ -2,8 +2,13 @@
 
 
 #include "ZombieAIController.h"
+#include "AICharacter.h"
+#include "Waypoint.h"
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include "MainCharacter.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
+
 
 AZombieAIController::AZombieAIController() {
 	PrimaryActorTick.bCanEverTick = true;
@@ -40,14 +45,46 @@ void AZombieAIController::BeginPlay()
 
 }
 
-void AZombieAIController::Possess(APawn* Pawn)
+void AZombieAIController::OnPossess(APawn* InPawn)
 {
-	Super::Possess(Pawn);
+	Super::OnPossess(InPawn);
+}
+
+void AZombieAIController::OnUnPossess()
+{
 }
 
 void AZombieAIController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+	AAICharacter* AICharacter = Cast<AAICharacter>(GetPawn());
+	if (AICharacter != nullptr)
+	{
+		if (DistanceToPlayer > AISightRadius)
+		{
+			bIsPlayerDetected = false;
+		}
+
+		if (AICharacter->NextWaypoint != nullptr && bIsPlayerDetected != true)
+		{
+			MoveToActor(AICharacter->NextWaypoint, 5.0f);
+		}
+		else if (bIsPlayerDetected == true)
+		{
+			AMainCharacter* Player = Cast<AMainCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+			MoveToActor(Player, 10.0f);
+
+			/*if (AICharacter->GetVelocity() == FVector(0,0,0))
+				UGameplayStatics::OpenLevel(GetWorld(), FName("FirstPersonExampleMap"));*/
+			
+		}
+		
+	}
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("NOT GETTING AI NIBBA")));
+	}
+
+	
 }
 
 FRotator AZombieAIController::GetControlRotation() const
@@ -61,7 +98,14 @@ FRotator AZombieAIController::GetControlRotation() const
 
 }
 
-void AZombieAIController::OnPawnDetected(TArray<AActor*> DetectedPawns)
+void AZombieAIController::OnPawnDetected(const TArray<AActor*>& DetectedPawns)
 {
+	for (size_t i = 0; i < DetectedPawns.Num(); i++)
+	{
+		DistanceToPlayer = GetPawn()->GetDistanceTo(DetectedPawns[i]);
 
+		UE_LOG(LogTemp, Warning, TEXT("Distance: %f"), DistanceToPlayer);
+	}
+
+	bIsPlayerDetected = true;
 }

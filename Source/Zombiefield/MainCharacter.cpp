@@ -337,6 +337,8 @@ void AMainCharacter::OnFire(float FirePressed)
 		if (Fired <= 0 && CurrentWeapon->WeaponAmmo.CurrentAmmoSize>0 && !IsReloading)
 		{
 			CurrentWeapon->WeaponAmmo.CurrentAmmoSize--;
+			if (CurrentWeapon->WeaponAmmo.CurrentAmmoSize <=0)
+				OnReload(1.0);
 			IsFiring = true;
 			Fired = FireRate;
 			if (CurrentWeapon->BulletClass != nullptr)

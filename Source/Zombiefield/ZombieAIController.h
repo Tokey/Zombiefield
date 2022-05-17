@@ -14,20 +14,21 @@ class ZOMBIEFIELD_API AZombieAIController : public AAIController
 {
 	GENERATED_BODY()
 	AZombieAIController();
-
+public:
 	virtual void BeginPlay() override;
 
-	virtual void Possess(APawn* Pawn) override;
+	virtual void OnPossess(APawn* InPawn) override;
+	virtual void OnUnPossess() override;
 
 	virtual void Tick(float DeltaSeconds) override;
 
 	virtual FRotator GetControlRotation() const override;
 
 	UFUNCTION()
-		void OnPawnDetected(TArray<AActor*> DetectedPawns);
+		void OnPawnDetected(const TArray<AActor*>& DetectedPawns);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = AI)
-		float AISightRadius = 500.0f;
+		float AISightRadius = 3000.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = AI)
 		float AISightAge = 5.0f;
@@ -36,9 +37,14 @@ class ZOMBIEFIELD_API AZombieAIController : public AAIController
 		float AILoseSightRadius = AISightRadius + 50.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = AI)
-		float AIFieldOfView = 90.0f;
+		float AIFieldOfView = 350.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = AI)
 		class UAISenseConfig_Sight* SightConfig;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = AI)
+	bool bIsPlayerDetected;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = AI)
+		float DistanceToPlayer = 0.f;
 	
 };

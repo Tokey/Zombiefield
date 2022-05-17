@@ -4,6 +4,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 #include "NiagaraComponent.h"
+#include "AICharacter.h"
 #include "NiagaraFunctionLibrary.h"
 
 
@@ -37,12 +38,17 @@ AZombiefieldProjectile::AZombiefieldProjectile()
 
 void AZombiefieldProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	AAICharacter* Enemy = Cast<AAICharacter>(OtherActor);
 	// Only add impulse and destroy projectile if we hit a physics
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics())
 	{
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 10.0f, GetActorLocation());
 
 		Destroy();
+	}
+	else if (Enemy != nullptr)
+	{
+		Enemy->Destroy();
 	}
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), spawnEffect, this->GetActorLocation(), Hit.ImpactNormal.Rotation());
 	Destroy();
