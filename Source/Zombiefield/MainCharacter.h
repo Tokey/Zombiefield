@@ -29,6 +29,8 @@ public:
 	//// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	FTimerHandle MemberTimerHandle;
+
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -37,7 +39,7 @@ public:
 
 	void MoveForward(float Val);
 	void MoveRight(float Val);
-
+	void AISpawner();
 	virtual void NextWeapon();
 	virtual void PreviousWeapon();
 	void OnFire(float FirePressed);
@@ -47,6 +49,7 @@ public:
 	void InterpFinalRecoil(float DeltaTime);
 	void InterpRecoil(float DeltaTime);
 	void Shoot();
+	
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
 	class USkeletalMeshComponent* ClientMesh;
@@ -76,15 +79,24 @@ public:
 	UPROPERTY(VisibleInstanceOnly,BlueprintReadWrite,ReplicatedUsing = OnRep_CurrentWeapon, Category= "State")
 	class AWeapon* CurrentWeapon;
 
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "State")
+		int Score;
+
 	//Called after changing weapons
 	UPROPERTY(BlueprintAssignable, Category="Delegates")
 	FCurrentWeaponChangedDelegate CurrentWeaponChangedDelegate;
+
+	UPROPERTY(EditAnywhere, Category = Projectile)
+		TSubclassOf<class AAICharacter> AItoSpawn;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Replicated, Category = "State")
 	int32 CurrentIndex = 0;
 
 	UFUNCTION(BlueprintCallable, Category="Character")
 	virtual void EquipWeapon(const int32 Index);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+		class UAmmoWidget* AmmoHUD;
 
 public:
 	UFUNCTION(BlueprintCallable, Category="Anim")
@@ -97,6 +109,9 @@ public:
 	float ADSWeight = 0.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anim")
 	EMovement EMovementEnumsMain;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+		int Health;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Configurations|Anim")

@@ -54,10 +54,6 @@ void UZombiefieldAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	LastRotation = CameraTransform.Rotator();
 	LastLocation = Character->GetTransform().GetLocation();
 	IsFiring = Character->IsFiring;
-	if(IsFiring)
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("Firing!!! %d"), CurrentWeapon->WeaponAmmo.CurrentAmmoSize));
-	else
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("NOT Firing!!!")));
 	EMovementEnums =  Character->EMovementEnumsMain;
 	RecoilTransformIK = Character->RecoilTransform;
 	RecoilRotationIK = RecoilTransformIK.GetRotation().Rotator();

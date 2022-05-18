@@ -3,10 +3,13 @@
 
 #include "MainCharacter.h"
 #include "Weapon.h"
+#include "AmmoWidget.h"
 #include "ZombiefieldAnimInstance.h"
+#include "AICharacter.h"
 #include "Camera/CameraComponent.h"
 #include "Runtime/Engine/Public/Net/UnrealNetwork.h"
 #include "ZombiefieldProjectile.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -27,7 +30,9 @@ AMainCharacter::AMainCharacter()
 {
 
 	Fired = FireRate;
-
+	Score = 0;
+	Health = 100;
+	Health = 100;
 
 	DefaultWalkSpeed = 600;
 	SprintingSpeed = 1000;
@@ -62,6 +67,8 @@ AMainCharacter::AMainCharacter()
 void AMainCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &AMainCharacter::AISpawner, 1.0f, true, 2.0f);
 
 
 	// Setup ADS timeline
@@ -132,6 +139,9 @@ void AMainCharacter::Tick(float DeltaTime)
 	AimingTimeline.TickTimeline(DeltaTime);
 	InterpFinalRecoil(DeltaTime);
 	InterpRecoil(DeltaTime);
+
+	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("HEALTH: %d"), Health));
+	
 }
 
 // Called to bind functionality to input
@@ -141,6 +151,9 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	PlayerInputComponent->BindAction("Aim", EInputEvent::IE_Pressed, this, &AMainCharacter::StartAiming);
 	PlayerInputComponent->BindAction("Aim", EInputEvent::IE_Released, this, &AMainCharacter::ReverseAiming);
+
+	InputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	InputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	PlayerInputComponent->BindAction("NextWeapon", EInputEvent::IE_Pressed, this, &AMainCharacter::NextWeapon);
 	PlayerInputComponent->BindAction("PreviousWeapon", EInputEvent::IE_Pressed, this, &AMainCharacter::PreviousWeapon);
@@ -336,7 +349,10 @@ void AMainCharacter::OnFire(float FirePressed)
 		
 		if (Fired <= 0 && CurrentWeapon->WeaponAmmo.CurrentAmmoSize>0 && !IsReloading)
 		{
+
+			
 			CurrentWeapon->WeaponAmmo.CurrentAmmoSize--;
+
 			if (CurrentWeapon->WeaponAmmo.CurrentAmmoSize <=0)
 				OnReload(1.0);
 			IsFiring = true;
@@ -384,6 +400,8 @@ void AMainCharacter::OnFire(float FirePressed)
 
 void AMainCharacter::OnReload(float RealoadPressed)
 {
+	
+
 	if(IsReloading)
 		ReloadDurationTicker -= GetWorld()->DeltaTimeSeconds;
 	if (ReloadDurationTicker <= 0)
@@ -445,6 +463,18 @@ void AMainCharacter::Shoot()
 		FMath::RandRange(-CurrentWeapon->RecoilStrength / 1.1, CurrentWeapon->RecoilStrength / 1.1));
 	FinalRecoilTransform.SetRotation(RecoilRot.Quaternion());
 	FinalRecoilTransform.SetLocation(RecoilVector);
+}
+
+
+void AMainCharacter::AISpawner()
+{
+	FVector SpawnLocation = FVector(FMath::RandRange(900, 1200), FMath::RandRange(2500, 2900), 270);
+	FRotator SpawnRotation = FRotator(0, 0, 0);
+
+	if (AItoSpawn != nullptr)
+		GetWorld()->SpawnActor<AAICharacter>(AItoSpawn, SpawnLocation, SpawnRotation);
+
+
 }
 
 

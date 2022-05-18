@@ -60,6 +60,16 @@ void AZombieAIController::Tick(float DeltaSeconds)
 	AAICharacter* AICharacter = Cast<AAICharacter>(GetPawn());
 	if (AICharacter != nullptr)
 	{
+		/*AMainCharacter* Playerr = Cast<AMainCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));;
+		if (DistanceToPlayer == 0)
+		{
+			if (Playerr != nullptr)
+				Playerr->Health--;
+		}
+		if (Playerr != nullptr)
+			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("health: %d"), Playerr->Health));
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("DISTANCE: %d"), DistanceToPlayer));*/
+
 		if (DistanceToPlayer > AISightRadius)
 		{
 			bIsPlayerDetected = false;
@@ -72,7 +82,7 @@ void AZombieAIController::Tick(float DeltaSeconds)
 		else if (bIsPlayerDetected == true)
 		{
 			AMainCharacter* Player = Cast<AMainCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-			MoveToActor(Player, 10.0f);
+			MoveToActor(Player, 5.0f);
 
 			/*if (AICharacter->GetVelocity() == FVector(0,0,0))
 				UGameplayStatics::OpenLevel(GetWorld(), FName("FirstPersonExampleMap"));*/
@@ -103,8 +113,10 @@ void AZombieAIController::OnPawnDetected(const TArray<AActor*>& DetectedPawns)
 	for (size_t i = 0; i < DetectedPawns.Num(); i++)
 	{
 		DistanceToPlayer = GetPawn()->GetDistanceTo(DetectedPawns[i]);
-
-		UE_LOG(LogTemp, Warning, TEXT("Distance: %f"), DistanceToPlayer);
+		
+		
+		
+		//UE_LOG(LogTemp, Warning, TEXT("Distance: %f"), DistanceToPlayer);
 	}
 
 	bIsPlayerDetected = true;

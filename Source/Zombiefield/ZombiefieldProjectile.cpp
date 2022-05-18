@@ -3,6 +3,8 @@
 #include "ZombiefieldProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include "MainCharacter.h"
 #include "NiagaraComponent.h"
 #include "AICharacter.h"
 #include "NiagaraFunctionLibrary.h"
@@ -48,7 +50,8 @@ void AZombiefieldProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAc
 	}
 	else if (Enemy != nullptr)
 	{
-		Enemy->Destroy();
+		Enemy->Health--;
+		
 	}
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), spawnEffect, this->GetActorLocation(), Hit.ImpactNormal.Rotation());
 	Destroy();
