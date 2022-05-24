@@ -12,6 +12,7 @@ void UAmmoWidget::NativeConstruct()
 
 	UpdateAmmoText("DUMMY TEXT");
 	UpdateScoreText("DUMMY Score");
+	UpdateHealthText("DUMMY Health");
 }
 
 void UAmmoWidget::UpdateAmmoText(FString Text)
@@ -22,4 +23,9 @@ void UAmmoWidget::UpdateAmmoText(FString Text)
 void UAmmoWidget::UpdateScoreText(FString Text)
 {
 	ScoreText->SetText(FText::FromString("Score: " + Text));
+}
+
+void UAmmoWidget::UpdateHealthText(FString Text)
+{
+	HealthText->SetText(FText::FromString("Health: " + Text));
 }

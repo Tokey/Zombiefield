@@ -4,6 +4,7 @@
 #include "AICharacter.h"
 #include "MainCharacter.h"
 #include "Components/SphereComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -17,12 +18,8 @@ AAICharacter::AAICharacter()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
-	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-	CollisionComp->InitSphereRadius(1000.0f);
-	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
-	CollisionComp->OnComponentHit.AddDynamic(this, &AAICharacter::OnHit);
-
-	
+	CollisionCompCap = GetCapsuleComponent();
+	CollisionCompCap->SetCapsuleRadius(50.f);
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 600.0f, 0.0f);
@@ -33,7 +30,8 @@ AAICharacter::AAICharacter()
 void AAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	CollisionCompCap->OnComponentHit.AddDynamic(this, &AAICharacter::OnHit);
+	GetCharacterMovement()->MaxWalkSpeed = FMath::RandRange(200, 550);
 }
 
 // Called every frame
@@ -58,12 +56,14 @@ void AAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 void AAICharacter::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("HITTTTTTTTTTTTTTTTTTTTT")));
+	
 	AMainCharacter* Player = Cast<AMainCharacter>(OtherActor);
 	// Only add impulse and destroy projectile if we hit a physics
 	if (Player != nullptr)
 	{
 		Player->Health--;
+		if (Player->Health <= 0)
+			UGameplayStatics::OpenLevel(GetWorld(), FName("FirstPersonExampleMap"));
 	}
 }
 

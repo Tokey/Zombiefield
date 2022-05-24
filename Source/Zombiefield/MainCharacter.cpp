@@ -32,7 +32,6 @@ AMainCharacter::AMainCharacter()
 	Fired = FireRate;
 	Score = 0;
 	Health = 100;
-	Health = 100;
 
 	DefaultWalkSpeed = 600;
 	SprintingSpeed = 1000;
@@ -68,7 +67,7 @@ void AMainCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &AMainCharacter::AISpawner, 1.0f, true, 2.0f);
+	GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &AMainCharacter::AISpawner, 1.0f, true, 5.0f);
 
 
 	// Setup ADS timeline
@@ -469,12 +468,18 @@ void AMainCharacter::Shoot()
 void AMainCharacter::AISpawner()
 {
 	FVector SpawnLocation = FVector(FMath::RandRange(900, 1200), FMath::RandRange(2500, 2900), 270);
+	FVector SpawnLocation2 = FVector(FMath::RandRange(-3333, -2999), FMath::RandRange(-4200, -3699), 270);
 	FRotator SpawnRotation = FRotator(0, 0, 0);
 
+	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("SPAWN!")));
 	if (AItoSpawn != nullptr)
+	{
 		GetWorld()->SpawnActor<AAICharacter>(AItoSpawn, SpawnLocation, SpawnRotation);
+		GetWorld()->SpawnActor<AAICharacter>(AItoSpawn, SpawnLocation2, SpawnRotation);
+	}
 
 
+	GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &AMainCharacter::AISpawner, 1.0f, true, 5.0f);
 }
 
 

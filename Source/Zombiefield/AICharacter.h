@@ -36,11 +36,11 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-		USphereComponent* CollisionComp;
+		UCapsuleComponent* CollisionCompCap;
 
 	
 
 	UFUNCTION()
 		void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-	USphereComponent* GetCollisionComp() const { return CollisionComp; }
+	UCapsuleComponent* GetCollisionComp() const { return CollisionCompCap; }
 };

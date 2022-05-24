@@ -20,12 +20,17 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void UpdateScoreText(FString Text);
+	UFUNCTION(BlueprintCallable)
+		void UpdateHealthText(FString Text);
 
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* AmmoText;
 
 	UPROPERTY(meta = (BindWidget))
 		class UTextBlock* ScoreText;
+
+	UPROPERTY(meta = (BindWidget))
+		class UTextBlock* HealthText;
 
 	void NativeConstruct() override;
 };

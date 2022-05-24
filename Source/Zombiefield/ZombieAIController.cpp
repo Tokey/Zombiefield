@@ -60,35 +60,8 @@ void AZombieAIController::Tick(float DeltaSeconds)
 	AAICharacter* AICharacter = Cast<AAICharacter>(GetPawn());
 	if (AICharacter != nullptr)
 	{
-		/*AMainCharacter* Playerr = Cast<AMainCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));;
-		if (DistanceToPlayer == 0)
-		{
-			if (Playerr != nullptr)
-				Playerr->Health--;
-		}
-		if (Playerr != nullptr)
-			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("health: %d"), Playerr->Health));
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("DISTANCE: %d"), DistanceToPlayer));*/
-
-		if (DistanceToPlayer > AISightRadius)
-		{
-			bIsPlayerDetected = false;
-		}
-
-		if (AICharacter->NextWaypoint != nullptr && bIsPlayerDetected != true)
-		{
-			MoveToActor(AICharacter->NextWaypoint, 5.0f);
-		}
-		else if (bIsPlayerDetected == true)
-		{
-			AMainCharacter* Player = Cast<AMainCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-			MoveToActor(Player, 5.0f);
-
-			/*if (AICharacter->GetVelocity() == FVector(0,0,0))
-				UGameplayStatics::OpenLevel(GetWorld(), FName("FirstPersonExampleMap"));*/
-			
-		}
-		
+		AMainCharacter* Player = Cast<AMainCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+		MoveToActor(Player, -1.0f,false);	
 	}
 	else {
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("NOT GETTING AI NIBBA")));
