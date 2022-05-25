@@ -7,6 +7,7 @@
 #include "MainCharacter.h"
 #include "NiagaraComponent.h"
 #include "AICharacter.h"
+#include "BulletPowerUp.h"
 #include "NiagaraFunctionLibrary.h"
 
 
@@ -41,6 +42,7 @@ AZombiefieldProjectile::AZombiefieldProjectile()
 void AZombiefieldProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	AAICharacter* Enemy = Cast<AAICharacter>(OtherActor);
+	ABulletPowerUp* power = Cast<ABulletPowerUp>(OtherActor);;
 	// Only add impulse and destroy projectile if we hit a physics
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics())
 	{
@@ -50,8 +52,11 @@ void AZombiefieldProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAc
 	}
 	else if (Enemy != nullptr)
 	{
-		Enemy->Health--;
-		
+		Enemy->Health = Enemy->Health - ProjectileDamage;
+	}
+	else if (power != nullptr)
+	{
+		power->Collect();
 	}
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), spawnEffect, this->GetActorLocation(), Hit.ImpactNormal.Rotation());
 	Destroy();

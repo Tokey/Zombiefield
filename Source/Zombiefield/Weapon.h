@@ -11,7 +11,7 @@ struct FIKProperties
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		class UAnimSequence* animPose;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -28,7 +28,7 @@ USTRUCT(BlueprintType)
 struct FAmmo
 {
 	GENERATED_BODY()
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int ClipSize = 30;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int CurrentAmmoSize = 30;
@@ -54,14 +54,17 @@ protected:
 public:
 	// Called every frame
 	//virtual void Tick(float DeltaTime) override;
-	
-	
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float FireRate;
-	
+		float FireRate;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<class AZombiefieldProjectile> BulletClass;
-	
+		TSubclassOf<class AZombiefieldProjectile> BulletClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TSubclassOf<class AZombiefieldProjectile> SuperBulletClass;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
 		class USceneComponent* Root;
 
@@ -81,12 +84,12 @@ public:
 		FTransform placementTransform;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	float RecoilStrength;
+		float RecoilStrength;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		float RecoilCompensationStrength;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="IK")
-	FTransform GetSightsWorldTransform() const;
-	virtual FTransform GetSightsWorldTransform_Implementation() const {return Mesh->GetSocketTransform(FName("Sights"));}
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "IK")
+		FTransform GetSightsWorldTransform() const;
+	virtual FTransform GetSightsWorldTransform_Implementation() const { return Mesh->GetSocketTransform(FName("Sights")); }
 };

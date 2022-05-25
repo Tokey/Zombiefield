@@ -21,6 +21,9 @@ class AZombiefieldProjectile : public AActor
 	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
 	USphereComponent* CollisionComp;
 
+	UPROPERTY(EditAnywhere, Category = Projectile)
+		int ProjectileDamage;
+
 	UPROPERTY(EditAnywhere, Category = ProjectileEffects)
 		UNiagaraSystem* spawnEffect;
 

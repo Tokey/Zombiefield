@@ -25,7 +25,7 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PreReplication(IRepChangedPropertyTracker& ChangedPropertyTracker) override;
 
-public:	
+public:
 	//// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -35,7 +35,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
-    class UCameraComponent* Camera;
+		class UCameraComponent* Camera;
 
 	void MoveForward(float Val);
 	void MoveRight(float Val);
@@ -49,79 +49,85 @@ public:
 	void InterpFinalRecoil(float DeltaTime);
 	void InterpRecoil(float DeltaTime);
 	void Shoot();
-	
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
-	class USkeletalMeshComponent* ClientMesh;
 
-	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
-	USkeletalMeshComponent* Mesh1P;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Mesh)
-	bool IsFiring;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Mesh)
-	bool IsWalkingForward;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Mesh)
-	bool IsWalkingBackward;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Recoil)
-    	FTransform RecoilTransform;
-    	FTransform FinalRecoilTransform;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+		class USkeletalMeshComponent* ClientMesh;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+		USkeletalMeshComponent* Mesh1P;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh)
+		bool IsFiring;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh)
+		bool IsWalkingForward;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh)
+		bool IsWalkingBackward;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Recoil)
+		FTransform RecoilTransform;
+	FTransform FinalRecoilTransform;
 
 protected:
 	//Weapon spawned by default
-	UPROPERTY(EditDefaultsOnly, Category="Configurations")
-	TArray<TSubclassOf<class AWeapon>> DefaultWeapons;
+	UPROPERTY(EditDefaultsOnly, Category = "Configurations")
+		TArray<TSubclassOf<class AWeapon>> DefaultWeapons;
 
 public:
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Replicated, Category="State")
-	TArray <class AWeapon*> Weapons;
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Replicated, Category = "State")
+		TArray <class AWeapon*> Weapons;
 
-	UPROPERTY(VisibleInstanceOnly,BlueprintReadWrite,ReplicatedUsing = OnRep_CurrentWeapon, Category= "State")
-	class AWeapon* CurrentWeapon;
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, ReplicatedUsing = OnRep_CurrentWeapon, Category = "State")
+		class AWeapon* CurrentWeapon;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "State")
 		int Score;
 
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "State")
+		float BulletPowerupTimer;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "State")
+		bool IsSuperBulletEnabled;
+
 	//Called after changing weapons
-	UPROPERTY(BlueprintAssignable, Category="Delegates")
-	FCurrentWeaponChangedDelegate CurrentWeaponChangedDelegate;
+	UPROPERTY(BlueprintAssignable, Category = "Delegates")
+		FCurrentWeaponChangedDelegate CurrentWeaponChangedDelegate;
 
 	UPROPERTY(EditAnywhere, Category = Projectile)
 		TSubclassOf<class AAICharacter> AItoSpawn;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Replicated, Category = "State")
-	int32 CurrentIndex = 0;
+		int32 CurrentIndex = 0;
 
-	UFUNCTION(BlueprintCallable, Category="Character")
-	virtual void EquipWeapon(const int32 Index);
+	UFUNCTION(BlueprintCallable, Category = "Character")
+		virtual void EquipWeapon(const int32 Index);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 		class UAmmoWidget* AmmoHUD;
 
 public:
-	UFUNCTION(BlueprintCallable, Category="Anim")
-	virtual  void StartAiming();
+	UFUNCTION(BlueprintCallable, Category = "Anim")
+		virtual  void StartAiming();
 
-	UFUNCTION(BlueprintCallable, Category="Anim")
-	virtual void ReverseAiming();
+	UFUNCTION(BlueprintCallable, Category = "Anim")
+		virtual void ReverseAiming();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category="Anim")
-	float ADSWeight = 0.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anim")
-	EMovement EMovementEnumsMain;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = "Anim")
+		float ADSWeight = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim")
+		EMovement EMovementEnumsMain;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 		int Health;
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Configurations|Anim")
-	class UCurveFloat* AimingCurve;
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configurations|Anim")
+		class UCurveFloat* AimingCurve;
+
 
 	FTimeline AimingTimeline;
-	
+
 	UFUNCTION(Server, Reliable)
-	void Server_Aim(const bool bForward = true);
+		void Server_Aim(const bool bForward = true);
 	virtual FORCEINLINE void Server_Aim_Implementation(const bool bForward)
 	{
 		Multi_Aim(bForward);
@@ -129,26 +135,26 @@ protected:
 	}
 
 	UFUNCTION(NetMulticast, Reliable)
-	void Multi_Aim(const bool bForward);
+		void Multi_Aim(const bool bForward);
 	virtual void Multi_Aim_Implementation(const bool bForward);
 
 	UFUNCTION()
-	virtual void TimeLineProgress(const float Value);
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
-	FVector GunOffset;
+		virtual void TimeLineProgress(const float Value);
 
-	
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		FVector GunOffset;
+
+
+
 
 protected:
 	UFUNCTION()
-	virtual void OnRep_CurrentWeapon(const class AWeapon* oldWeapon);
+		virtual void OnRep_CurrentWeapon(const class AWeapon* oldWeapon);
 
 	UFUNCTION(Server, Reliable)
-	void Server_SetCurrentWeapon(class AWeapon* Weapon);
+		void Server_SetCurrentWeapon(class AWeapon* Weapon);
 	virtual void Server_SetCurrentWeapon_Implementation(class AWeapon* Weapon);
 
 	class UCharacterMovementComponent* playerController;
-	
+
 };

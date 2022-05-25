@@ -5,6 +5,7 @@
 #include "MainCharacter.h"
 #include "Components/SphereComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -42,6 +43,7 @@ void AAICharacter::Tick(float DeltaTime)
 	{
 		AMainCharacter* Player = Cast<AMainCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 		Player->Score++;
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), DeathParticleEffect, GetTransform());
 		Destroy();
 	}
 	
@@ -51,7 +53,6 @@ void AAICharacter::Tick(float DeltaTime)
 void AAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
 void AAICharacter::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -62,6 +63,9 @@ void AAICharacter::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrim
 	if (Player != nullptr)
 	{
 		Player->Health--;
+		//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), AttackSparkParticleEffect, GetTransform());
+		//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), AttckFireParticleEffect, GetTransform());
+
 		if (Player->Health <= 0)
 			UGameplayStatics::OpenLevel(GetWorld(), FName("FirstPersonExampleMap"));
 	}

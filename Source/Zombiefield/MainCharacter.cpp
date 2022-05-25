@@ -23,6 +23,9 @@ bool IsWalking;
 bool IsReloading;
 float DefaultWalkSpeed;
 float SprintingSpeed;
+float SuperBulletCurrentTimer;
+
+
 
 bool IsSprinting;
 // Sets default values
@@ -32,7 +35,8 @@ AMainCharacter::AMainCharacter()
 	Fired = FireRate;
 	Score = 0;
 	Health = 100;
-
+	BulletPowerupTimer = 10;
+	SuperBulletCurrentTimer = BulletPowerupTimer;
 	DefaultWalkSpeed = 600;
 	SprintingSpeed = 1000;
 
@@ -140,7 +144,7 @@ void AMainCharacter::Tick(float DeltaTime)
 	InterpRecoil(DeltaTime);
 
 	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("HEALTH: %d"), Health));
-	
+
 }
 
 // Called to bind functionality to input
@@ -180,14 +184,14 @@ void AMainCharacter::MoveForward(float Value)
 		{
 			if (!IsSprinting && !IsReloading)
 				EMovementEnumsMain = EMovement::EMForward;
-			else if(!IsReloading)
+			else if (!IsReloading)
 				EMovementEnumsMain = EMovement::EMForwardSprint;
 		}
 		else if (Value == -1.0)
 		{
 			if (!IsSprinting && !IsReloading)
 				EMovementEnumsMain = EMovement::EMBackward;
-			else if(!IsReloading)
+			else if (!IsReloading)
 				EMovementEnumsMain = EMovement::EMBackwardSprint;
 
 		}
@@ -209,14 +213,14 @@ void AMainCharacter::MoveRight(float Value)
 		{
 			if (!IsSprinting && !IsReloading)
 				EMovementEnumsMain = EMovement::EMRight;
-			else if(!IsReloading)
+			else if (!IsReloading)
 				EMovementEnumsMain = EMovement::EMRightSprint;
 		}
 		else if (Value == -1.0)
 		{
 			if (!IsSprinting && !IsReloading)
 				EMovementEnumsMain = EMovement::EMLeft;
-			else if(!IsReloading)
+			else if (!IsReloading)
 				EMovementEnumsMain = EMovement::EMLeftSprint;
 		}
 		// add movement in that direction
@@ -340,19 +344,27 @@ void AMainCharacter::OnRep_CurrentWeapon(const AWeapon* OldWeapon)
 void AMainCharacter::OnFire(float FirePressed)
 {
 
+	if (IsSuperBulletEnabled == true)
+		SuperBulletCurrentTimer -= GetWorld()->DeltaTimeSeconds;
+	if (SuperBulletCurrentTimer <= 0)
+	{
+		IsSuperBulletEnabled = false;
+		SuperBulletCurrentTimer = BulletPowerupTimer;
+	}
+
 	if (FirePressed == 1.0)
 	{
-		
+
 		Fired -= GetWorld()->DeltaTimeSeconds;
 		//AnimInstance->IsFiring = true;
-		
-		if (Fired <= 0 && CurrentWeapon->WeaponAmmo.CurrentAmmoSize>0 && !IsReloading)
+
+		if (Fired <= 0 && CurrentWeapon->WeaponAmmo.CurrentAmmoSize > 0 && !IsReloading)
 		{
 
-			
+
 			CurrentWeapon->WeaponAmmo.CurrentAmmoSize--;
 
-			if (CurrentWeapon->WeaponAmmo.CurrentAmmoSize <=0)
+			if (CurrentWeapon->WeaponAmmo.CurrentAmmoSize <= 0)
 				OnReload(1.0);
 			IsFiring = true;
 			Fired = FireRate;
@@ -378,7 +390,10 @@ void AMainCharacter::OnFire(float FirePressed)
 					ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 
 					// spawn the projectile at the muzzle
-					World->SpawnActor<AZombiefieldProjectile>(CurrentWeapon->BulletClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+					if (!IsSuperBulletEnabled)
+						World->SpawnActor<AZombiefieldProjectile>(CurrentWeapon->BulletClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+					else
+						World->SpawnActor<AZombiefieldProjectile>(CurrentWeapon->SuperBulletClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 				}
 			}
 
@@ -399,9 +414,9 @@ void AMainCharacter::OnFire(float FirePressed)
 
 void AMainCharacter::OnReload(float RealoadPressed)
 {
-	
 
-	if(IsReloading)
+
+	if (IsReloading)
 		ReloadDurationTicker -= GetWorld()->DeltaTimeSeconds;
 	if (ReloadDurationTicker <= 0)
 		IsReloading = false;
@@ -414,7 +429,7 @@ void AMainCharacter::OnReload(float RealoadPressed)
 			CurrentWeapon->WeaponAmmo.CurrentAmmoSize = CurrentWeapon->WeaponAmmo.ClipSize;
 		}
 	}
-	else if(!IsReloading)
+	else if (!IsReloading)
 		ReloadDurationTicker = CurrentWeapon->WeaponAmmo.ReloadDuration;
 }
 
@@ -477,7 +492,6 @@ void AMainCharacter::AISpawner()
 		GetWorld()->SpawnActor<AAICharacter>(AItoSpawn, SpawnLocation, SpawnRotation);
 		GetWorld()->SpawnActor<AAICharacter>(AItoSpawn, SpawnLocation2, SpawnRotation);
 	}
-
 
 	GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &AMainCharacter::AISpawner, 1.0f, true, 5.0f);
 }

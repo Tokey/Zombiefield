@@ -24,6 +24,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintreadWrite)
 		int Health;
 
+	UPROPERTY(EditAnywhere)
+		class UParticleSystem* DeathParticleEffect;
+
+	UPROPERTY(EditAnywhere)
+		class UParticleSystem* AttckFireParticleEffect;
+
+	UPROPERTY(EditAnywhere)
+		class UParticleSystem* AttackSparkParticleEffect;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -37,8 +46,6 @@ public:
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
 		UCapsuleComponent* CollisionCompCap;
-
-	
 
 	UFUNCTION()
 		void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
