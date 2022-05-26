@@ -83,8 +83,6 @@ void AMainCharacter::BeginPlay()
 		AimingTimeline.AddInterpFloat(AimingCurve, TimelineFloat);
 	}
 
-
-
 	// Client Mesh logic
 	if (IsLocallyControlled())
 	{
@@ -345,23 +343,24 @@ void AMainCharacter::OnFire(float FirePressed)
 {
 
 	if (IsSuperBulletEnabled == true)
+	{
 		SuperBulletCurrentTimer -= GetWorld()->DeltaTimeSeconds;
+		RageModeText = "Rage Mode: " + FString::FromInt((int)SuperBulletCurrentTimer);
+	}
 	if (SuperBulletCurrentTimer <= 0)
 	{
+		RageModeText = "";
 		IsSuperBulletEnabled = false;
 		SuperBulletCurrentTimer = BulletPowerupTimer;
 	}
 
 	if (FirePressed == 1.0)
 	{
-
 		Fired -= GetWorld()->DeltaTimeSeconds;
 		//AnimInstance->IsFiring = true;
 
 		if (Fired <= 0 && CurrentWeapon->WeaponAmmo.CurrentAmmoSize > 0 && !IsReloading)
 		{
-
-
 			CurrentWeapon->WeaponAmmo.CurrentAmmoSize--;
 
 			if (CurrentWeapon->WeaponAmmo.CurrentAmmoSize <= 0)
@@ -396,12 +395,6 @@ void AMainCharacter::OnFire(float FirePressed)
 						World->SpawnActor<AZombiefieldProjectile>(CurrentWeapon->SuperBulletClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 				}
 			}
-
-			// try and play the sound if specified
-			/*if (FireSound != nullptr)
-			{
-				UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
-			}*/
 		}
 	}
 	else if (FirePressed == 0.0)
@@ -414,8 +407,6 @@ void AMainCharacter::OnFire(float FirePressed)
 
 void AMainCharacter::OnReload(float RealoadPressed)
 {
-
-
 	if (IsReloading)
 		ReloadDurationTicker -= GetWorld()->DeltaTimeSeconds;
 	if (ReloadDurationTicker <= 0)
@@ -486,14 +477,20 @@ void AMainCharacter::AISpawner()
 	FVector SpawnLocation2 = FVector(FMath::RandRange(-3333, -2999), FMath::RandRange(-4200, -3699), 270);
 	FRotator SpawnRotation = FRotator(0, 0, 0);
 
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("SPAWN!")));
-	if (AItoSpawn != nullptr)
+	if (WeakAItoSpawn != nullptr && StrongAItoSpawn != nullptr)
 	{
-		GetWorld()->SpawnActor<AAICharacter>(AItoSpawn, SpawnLocation, SpawnRotation);
-		GetWorld()->SpawnActor<AAICharacter>(AItoSpawn, SpawnLocation2, SpawnRotation);
+		if (FMath::RandBool() == true)
+		{
+			GetWorld()->SpawnActor<AAICharacter>(WeakAItoSpawn, SpawnLocation, SpawnRotation);
+			GetWorld()->SpawnActor<AAICharacter>(WeakAItoSpawn, SpawnLocation2, SpawnRotation);
+		}
+		else {
+			GetWorld()->SpawnActor<AAICharacter>(StrongAItoSpawn, SpawnLocation, SpawnRotation);
+			GetWorld()->SpawnActor<AAICharacter>(StrongAItoSpawn, SpawnLocation2, SpawnRotation);
+		}
 	}
 
-	GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &AMainCharacter::AISpawner, 1.0f, true, 5.0f);
+	GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &AMainCharacter::AISpawner, 1.0f, true, FMath::RandRange(3, 6));
 }
 
 

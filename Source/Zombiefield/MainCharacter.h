@@ -83,6 +83,9 @@ public:
 		int Score;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "State")
+		FString RageModeText;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "State")
 		float BulletPowerupTimer;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "State")
@@ -92,8 +95,10 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Delegates")
 		FCurrentWeaponChangedDelegate CurrentWeaponChangedDelegate;
 
-	UPROPERTY(EditAnywhere, Category = Projectile)
-		TSubclassOf<class AAICharacter> AItoSpawn;
+	UPROPERTY(EditAnywhere, Category = AI)
+		TSubclassOf<class AAICharacter> WeakAItoSpawn;
+	UPROPERTY(EditAnywhere, Category = AI)
+		TSubclassOf<class AAICharacter> StrongAItoSpawn;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Replicated, Category = "State")
 		int32 CurrentIndex = 0;
@@ -143,9 +148,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		FVector GunOffset;
-
-
-
 
 protected:
 	UFUNCTION()

@@ -29,3 +29,8 @@ void UAmmoWidget::UpdateHealthText(FString Text)
 {
 	HealthText->SetText(FText::FromString("Health: " + Text));
 }
+
+void UAmmoWidget::UpdateRageModeText(FString Text)
+{
+	RageModeText->SetText(FText::FromString(Text));
+}

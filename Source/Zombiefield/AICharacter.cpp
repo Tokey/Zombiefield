@@ -3,13 +3,15 @@
 
 #include "AICharacter.h"
 #include "MainCharacter.h"
+#include "BulletPowerUp.h"
 #include "Components/SphereComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
 // Sets default values
-AAICharacter::AAICharacter()
+AAICharacter::AAICharacter():
+EZombieMovementEnums(EZombieMovement::EMIdle)
 {
 	
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -44,9 +46,21 @@ void AAICharacter::Tick(float DeltaTime)
 		AMainCharacter* Player = Cast<AMainCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 		Player->Score++;
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), DeathParticleEffect, GetTransform());
+		int RageModifier = FMath::RandRange(0.f, 10.f);
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("Rage! %d"), RageModifier));
+		if (RageModifier == 4)
+			Player->IsSuperBulletEnabled = true;
 		Destroy();
 	}
-	
+
+	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("VELOCITY: %d"), this->GetVelocity().Length()));
+	if (this->GetVelocity().Length() > 3 && this->GetVelocity().Length() < 401)
+		EZombieMovementEnums = EZombieMovement::EMWalking;
+	else if(this->GetVelocity().Length() >= 401)
+		EZombieMovementEnums = EZombieMovement::EMRunning;
+	if (this->GetVelocity().Length() <= 3)
+		EZombieMovementEnums = EZombieMovement::EMIdle;
+
 }
 
 // Called to bind functionality to input
@@ -62,9 +76,8 @@ void AAICharacter::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrim
 	// Only add impulse and destroy projectile if we hit a physics
 	if (Player != nullptr)
 	{
+		EZombieMovementEnums = EZombieMovement::EMAttacking;
 		Player->Health--;
-		//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), AttackSparkParticleEffect, GetTransform());
-		//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), AttckFireParticleEffect, GetTransform());
 
 		if (Player->Health <= 0)
 			UGameplayStatics::OpenLevel(GetWorld(), FName("FirstPersonExampleMap"));

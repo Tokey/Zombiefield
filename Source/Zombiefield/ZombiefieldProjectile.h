@@ -12,14 +12,14 @@
 class USphereComponent;
 class UProjectileMovementComponent;
 
-UCLASS(config=Game)
+UCLASS(config = Game)
 class AZombiefieldProjectile : public AActor
 {
 	GENERATED_BODY()
 
-	/** Sphere collision component */
-	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
-	USphereComponent* CollisionComp;
+		/** Sphere collision component */
+		UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+		USphereComponent* CollisionComp;
 
 	UPROPERTY(EditAnywhere, Category = Projectile)
 		int ProjectileDamage;
@@ -29,7 +29,7 @@ class AZombiefieldProjectile : public AActor
 
 	/** Projectile movement component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-	UProjectileMovementComponent* ProjectileMovement;
+		UProjectileMovementComponent* ProjectileMovement;
 
 	FTimerHandle MemberTimerHandle;
 
@@ -37,11 +37,10 @@ public:
 	AZombiefieldProjectile();
 	/** called when projectile hits something */
 	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-	
+		void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
 	/** Returns CollisionComp subobject **/
 	USphereComponent* GetCollisionComp() const { return CollisionComp; }
 	/** Returns ProjectileMovement subobject **/
 	UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
 };
-

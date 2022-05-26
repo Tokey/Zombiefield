@@ -8,7 +8,15 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AICharacter.generated.h"
 
+UENUM(BlueprintType)
+enum class EZombieMovement : uint8
+{
+	EMWalking UMETA(DisplayName = "Walking"),
+	EMRunning UMETA(DisplayName = "Running"),
+	EMAttacking UMETA(DisplayName = "Attacking"),
 
+	EMIdle UMETA(DisplayName = "Idle")
+};
 UCLASS()
 class ZOMBIEFIELD_API AAICharacter : public ACharacter
 {
@@ -17,6 +25,9 @@ class ZOMBIEFIELD_API AAICharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AAICharacter();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim")
+		EZombieMovement EZombieMovementEnums;
 
 	UPROPERTY(EditAnywhere, BlueprintreadWrite)
 	class AWaypoint* NextWaypoint;

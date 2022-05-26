@@ -7,24 +7,30 @@
 #include "AmmoWidget.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class ZOMBIEFIELD_API UAmmoWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
 public:
 	UFUNCTION(BlueprintCallable)
-	void UpdateAmmoText(FString Text);
+		void UpdateAmmoText(FString Text);
 
 	UFUNCTION(BlueprintCallable)
 		void UpdateScoreText(FString Text);
 	UFUNCTION(BlueprintCallable)
 		void UpdateHealthText(FString Text);
+	UFUNCTION(BlueprintCallable)
+		void UpdateRageModeText(FString Text);
 
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* AmmoText;
+		class UTextBlock* AmmoText;
+
+
+	UPROPERTY(meta = (BindWidget))
+		class UTextBlock* RageModeText;
 
 	UPROPERTY(meta = (BindWidget))
 		class UTextBlock* ScoreText;
