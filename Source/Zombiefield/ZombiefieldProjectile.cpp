@@ -46,13 +46,14 @@ void AZombiefieldProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAc
 	// Only add impulse and destroy projectile if we hit a physics
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics())
 	{
-		OtherComp->AddImpulseAtLocation(GetVelocity() * 10.0f, GetActorLocation());
+		OtherComp->AddImpulseAtLocation(GetVelocity() * 3.0f, GetActorLocation());
 
 		Destroy();
 	}
 	else if (Enemy != nullptr)
 	{
 		Enemy->Health = Enemy->Health - ProjectileDamage;
+		//OtherComp->AddImpulseAtLocation(GetVelocity() * 2.0f, GetActorLocation());
 	}
 	else if (power != nullptr)
 	{

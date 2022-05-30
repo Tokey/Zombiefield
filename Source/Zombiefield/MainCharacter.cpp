@@ -169,7 +169,7 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
 	PlayerInputComponent->BindAxis("Fire", this, &AMainCharacter::OnFire);
-	PlayerInputComponent->BindAxis("REload", this, &AMainCharacter::OnReload);
+	PlayerInputComponent->BindAxis("Reload", this, &AMainCharacter::OnReload);
 
 }
 
@@ -235,7 +235,8 @@ void AMainCharacter::MoveRight(float Value)
 void AMainCharacter::StartAiming()
 {
 	IsAiming = true;
-	if (IsLocallyControlled() || HasAuthority()) {
+	if (IsLocallyControlled() || HasAuthority()) 
+	{
 		Multi_Aim(true);
 	}
 	if (!HasAuthority())
@@ -330,10 +331,12 @@ void AMainCharacter::OnRep_CurrentWeapon(const AWeapon* OldWeapon)
 			CurrentWeapon->CurrentOwner = this;
 		}
 		CurrentWeapon->Mesh->SetVisibility(true);
+		CurrentWeapon->SightStaticMesh->SetVisibility(true);
 	}
 	if (OldWeapon)
 	{
 		OldWeapon->Mesh->SetVisibility(false);
+		OldWeapon->SightStaticMesh->SetVisibility(false);
 	}
 
 	CurrentWeaponChangedDelegate.Broadcast(CurrentWeapon, OldWeapon);
@@ -353,10 +356,9 @@ void AMainCharacter::OnFire(float FirePressed)
 		IsSuperBulletEnabled = false;
 		SuperBulletCurrentTimer = BulletPowerupTimer;
 	}
-
+	Fired -= GetWorld()->DeltaTimeSeconds;
 	if (FirePressed == 1.0)
 	{
-		Fired -= GetWorld()->DeltaTimeSeconds;
 		//AnimInstance->IsFiring = true;
 
 		if (Fired <= 0 && CurrentWeapon->WeaponAmmo.CurrentAmmoSize > 0 && !IsReloading)
@@ -401,7 +403,7 @@ void AMainCharacter::OnFire(float FirePressed)
 	{
 		IsFiring = false;
 		//AnimInstance->IsFiring = false;
-		Fired = 0;
+		//Fired = 0;
 	}
 }
 

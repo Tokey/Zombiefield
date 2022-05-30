@@ -76,7 +76,7 @@ public:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Replicated, Category = "State")
 		TArray <class AWeapon*> Weapons;
 
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, ReplicatedUsing = OnRep_CurrentWeapon, Category = "State")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_CurrentWeapon, Category = "State")
 		class AWeapon* CurrentWeapon;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "State")

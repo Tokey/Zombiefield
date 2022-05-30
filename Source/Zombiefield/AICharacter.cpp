@@ -47,13 +47,13 @@ void AAICharacter::Tick(float DeltaTime)
 		Player->Score++;
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), DeathParticleEffect, GetTransform());
 		int RageModifier = FMath::RandRange(0.f, 10.f);
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("Rage! %d"), RageModifier));
+		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("Rage! %d"), RageModifier));
 		if (RageModifier == 4)
 			Player->IsSuperBulletEnabled = true;
 		Destroy();
 	}
 
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("VELOCITY: %d"), this->GetVelocity().Length()));
+	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, FString::Printf(TEXT("VELOCITY: %d"), this->GetVelocity().Length()));
 	if (this->GetVelocity().Length() > 3 && this->GetVelocity().Length() < 401)
 		EZombieMovementEnums = EZombieMovement::EMWalking;
 	else if(this->GetVelocity().Length() >= 401)

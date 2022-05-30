@@ -70,6 +70,8 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
 		class USkeletalMeshComponent* Mesh;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
+		class UStaticMeshComponent* SightStaticMesh;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "State")
 		class AMainCharacter* CurrentOwner;

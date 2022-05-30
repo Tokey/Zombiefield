@@ -60,8 +60,10 @@
 /DORIGINAL_FILE_NAME="UnrealEditor-RD.dll"
 /DBUILT_FROM_CHANGELIST=19505902
 /DBUILD_VERSION=++UE5+Release-5.0-CL-19505902
-/DBUILD_ICON_FILE_NAME="\"..\\Build\\Windows\\Resources\\Default.ico\""
+/DBUILD_ICON_FILE_NAME="\"D:\\Unreal Projects\\UE5\\Zombiefield\\Build\\Windows\\Application.ico\""
+/DPROJECT_COMPANY_NAME=Attrito
 /DPROJECT_COPYRIGHT_STRING="Fill out your copyright notice in the Description page of Project Settings."
+/DPROJECT_PRODUCT_NAME=Zombiefield
 /DPROJECT_PRODUCT_IDENTIFIER=Zombiefield
 /fo "D:\Unreal Projects\UE5\Zombiefield\Plugins\Developer\RiderLink\Intermediate\Build\Win64\UnrealEditor\Development\RD\Default.rc2.res"
 "..\Build\Windows\Resources\Default.rc2"

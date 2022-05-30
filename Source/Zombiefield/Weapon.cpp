@@ -18,13 +18,18 @@ AWeapon::AWeapon()
 
 	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
 	Mesh->SetupAttachment(Root);
+	SightStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Sights"));
+	SightStaticMesh->SetupAttachment(Root);
 }
 
 // Called when the game starts or when spawned
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
-	if(!CurrentOwner)
+	if (!CurrentOwner)
+	{
 		Mesh->SetVisibility(false);
+		SightStaticMesh->SetVisibility(false);
+	}
 }
 
